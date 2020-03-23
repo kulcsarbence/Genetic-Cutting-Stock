@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="E:\lazarus\fpc\3.0.4\bin\x86_64-win64\fpc.exe" Date="1331391477"/>
+  <Params Value=" -MObjFPC -Scghi -O1 -g -gl -WG -l -vewnhibq -FiC:\Users\bance\Desktop\Genetic-Cutting-Algorithm\Genetic1-GUI\lib\x86_64-win64 -FuE:\lazarus\components\fpvectorial\lib\x86_64-win64 -FuE:\lazarus\components\bgrabitmap\lib\x86_64-win64\3.0.4 -FuE:\lazarus\components\opengl\lib\x86_64-win64\win32 -FuE:\lazarus\components\aggpas\lazarus\lib\x86_64-win64 -FuE:\lazarus\lcl\units\x86_64-win64\win32 -FuE:\lazarus\lcl\units\x86_64-win64 -FuE:\lazarus\components\lazutils\lib\x86_64-win64 -FuE:\lazarus\packager\units\x86_64-win64 -FuC:\Users\bance\Desktop\Genetic-Cutting-Algorithm\Genetic1-GUI\ -FUC:\Users\bance\Desktop\Genetic-Cutting-Algorithm\Genetic1-GUI\lib\x86_64-win64\ -FEC:\Users\bance\Desktop\Genetic-Cutting-Algorithm\Genetic1-GUI\ -oC:\Users\bance\Desktop\Genetic-Cutting-Algorithm\Genetic1-GUI\project1.exe -dLCL -dLCLwin32 project1.lpr"/>
+</CONFIG>

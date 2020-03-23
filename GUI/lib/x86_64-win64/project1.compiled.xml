@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="F:\Lazarus\fpc\3.0.4\bin\x86_64-win64\fpc.exe" Date="1331391477"/>
+  <Params Value=" -MObjFPC -Scghi -O1 -g -gl -WG -l -vewnhibq -FiC:\Users\Bence\Desktop\Genetic1-GUI\lib\x86_64-win64 -FuF:\Lazarus\components\fpvectorial\lib\x86_64-win64 -FuF:\Lazarus\components\bgrabitmap\lib\x86_64-win64\3.0.4 -FuF:\Lazarus\components\opengl\lib\x86_64-win64\win32 -FuF:\Lazarus\components\aggpas\lazarus\lib\x86_64-win64 -FuF:\Lazarus\lcl\units\x86_64-win64\win32 -FuF:\Lazarus\lcl\units\x86_64-win64 -FuF:\Lazarus\components\lazutils\lib\x86_64-win64 -FuF:\Lazarus\packager\units\x86_64-win64 -FuC:\Users\Bence\Desktop\Genetic1-GUI\ -FUC:\Users\Bence\Desktop\Genetic1-GUI\lib\x86_64-win64\ -FEC:\Users\Bence\Desktop\Genetic1-GUI\ -oC:\Users\Bence\Desktop\Genetic1-GUI\project1.exe -dLCL -dLCLwin32 project1.lpr"/>
+</CONFIG>

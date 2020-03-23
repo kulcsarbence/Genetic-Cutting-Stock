@@ -91,10 +91,10 @@ public:
 		int cuccli = steps.size();
 		int crossOverPoint;
 		if (steps.size() > 0 && steps.size() < (whichBasesToBeCut.size() * 30)) {
-			crossOverPoint = getRandom(steps.size() / 2 + 1, cuccli);
+			crossOverPoint = getRandom(steps.size(), cuccli);
 			//std::cout << "kezdet" << std::endl;
 			while (steps[crossOverPoint - 1]->getBorder() == false) {
-				crossOverPoint = getRandom(steps.size() / 2 + 1, cuccli);
+				crossOverPoint = getRandom(steps.size() , cuccli);
 				ratioToGive = LKO(steps[crossOverPoint - 1]->getBase()->getHeight(), steps[crossOverPoint - 1]->getBase()->getWidth());
 				//std::cout << ratioToGive << std::endl;
 			}
@@ -268,14 +268,85 @@ public:
 		int someCounter = 0;
 
 		for (int i = 0; i < stepps.size(); i++) {
+			std::vector<Base*> temp;
+			for (auto a : temp) {
+				delete a;
+			}
+			//std::cout << "VectCounter: " << vectCounter << std::endl;
+			std::cout << "Steppsben levo base: " << stepps[i]->getBase()->getWidth() << " * " << stepps[i]->getBase()->getHeight() << std::endl;
+			std::cout << "BaseVectben levo base: " << vectCounter <<" : "<< baseVect[vectCounter]->getWidth() << " * " << baseVect[vectCounter]->getHeight() << std::endl;
+			
+			if (dynamic_cast<HorizontalStep*>(stepps[i]) != nullptr) {
+				steps.push_back(stepps[i]);
+				int whereToCut = stepps[i]->getPos();
+				std::cout << "Horizontal step. " << " WhereToCut: " << whereToCut << std::endl;
+				std::cout << "Ezen az elemen - width: " << baseVect[vectCounter]->getWidth() << " height: " << baseVect[vectCounter]->getHeight() << std::endl;
+				std::cout << std::endl;
+				//IDEIGLENES MEGOLDAS:
+				//IDEIGLENES MEGOLDAS:
+				//IDEIGLENES MEGOLDAS:
+				//IDEIGLENES MEGOLDAS:
+				/*if (whereToCut > baseVect[vectCounter]->getHeight() || whereToCut < 0) {
+					std::cout << "problem" << std::endl;
+					whereToCut = getRandom(0, baseVect[vectCounter]->getHeight());
+				}*/
+				//
+				//
+				//
+				//
+
+				temp = stepps[i]->getBase()->horizontalCut(whereToCut, cutWidth);
+				if (temp.size() > 0) {
+
+					newBaseVect.push_back(temp[0]);
+				}
+				if (temp.size() > 1) {
+					newBaseVect.push_back(temp[1]);
+				}
+				
+				//vectCounter++;
+			}
+			if (dynamic_cast<VerticalStep*>(stepps[i]) != nullptr) {
+				steps.push_back(stepps[i]);
+				int whereToCut = stepps[i]->getPos();
+				std::cout << "Vertical step. " << " WhereToCut: " << whereToCut << std::endl;
+				std::cout << "Ezen az elemen - width: " << baseVect[vectCounter]->getWidth() << " height: " << baseVect[vectCounter]->getHeight() << std::endl;
+				std::cout << std::endl;
+				/*if (whereToCut > baseVect[vectCounter]->getWidth() || whereToCut < 0) {
+					std::cout << "problem2" << std::endl;
+					whereToCut = getRandom(0, baseVect[vectCounter]->getWidth());
+				}*/
+
+				temp = stepps[i]->getBase()->verticalCut(whereToCut, cutWidth);
+				if (temp.size() > 0) {
+					newBaseVect.push_back(temp[0]);
+				}
+				if (temp.size() > 1) {
+					newBaseVect.push_back(temp[1]);
+				}
+				//vectCounter++;
+
+			}
 			if (dynamic_cast<NocutStep*>(stepps[i]) != nullptr) {
 				steps.push_back(stepps[i]);
-				newBaseVect.push_back(baseVect[vectCounter]);
-				vectCounter++;
+				newBaseVect.push_back(stepps[i]->getBase());
+				//vectCounter++;
 			}
-			/*else {
+			if (dynamic_cast<VerticalStep*>(stepps[i]) != nullptr || dynamic_cast<HorizontalStep*>(stepps[i]) != nullptr) {
+				std::vector<Base*> draw;
+				draw = newBaseVect;
+				if (stepps[i]->getBorder() == false) {
+					for (int j = (temp.size()>1 ? i+1 : i) ; j < stepps.size(); j++) {
+						draw.push_back(stepps[j]->getBase());
+						if (stepps[j]->getBorder() == true) {
+							break;
+						}
+					}
+				}
+				baseVect = draw;
+				this->calculateFitness(false);
 				std::ofstream file;
-				file.open("\ready\temp"+std::to_string(someCounter++)+".svg");
+				file.open("temp" + std::to_string(someCounter++) + ".svg");
 				file << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">";
 				file << "<svg " << "xmlns=\"http://www.w3.org/2000/svg\"" << " width=\"" << firstBaseVect->getWidth() << "\" " <<
 					"height=\"" << firstBaseVect->getHeight() << "\">";
@@ -288,79 +359,40 @@ public:
 						"style=\"fill:" << (a->getAccepted() == true ? "red" : "blue") << "; stroke:pink; stroke - width:1; fill - opacity:0.1; stroke - opacity:0.9\" />";
 				}
 				file << " <text x=\"0\" y=\"15\" fill=\"white\">" << "Waste percentage: " << wastePercentage << "%" << "</text> ";
+
 				file << "</svg>";
 				file.close();
-			}*/
-			if (dynamic_cast<HorizontalStep*>(stepps[i]) != nullptr) {
-				steps.push_back(stepps[i]);
-				int whereToCut = stepps[i]->getPos();
-				//IDEIGLENES MEGOLDAS:
-				//IDEIGLENES MEGOLDAS:
-				//IDEIGLENES MEGOLDAS:
-				//IDEIGLENES MEGOLDAS:
-				if (whereToCut > baseVect[vectCounter]->getHeight() || whereToCut < 0) {
-					std::cout << "problem" << std::endl;
-					whereToCut = getRandom(0, baseVect[vectCounter]->getHeight());
-				}
-				//
-				//
-				//
-				//
-
-				std::vector<Base*> temp = baseVect[vectCounter++]->horizontalCut(whereToCut, cutWidth);
-				if (temp.size() > 0) {
-
-					newBaseVect.push_back(temp[0]);
-				}
-				if (temp.size() > 1) {
-					newBaseVect.push_back(temp[1]);
-				}
+				draw.clear();
 			}
-			if (dynamic_cast<VerticalStep*>(stepps[i]) != nullptr) {
-				steps.push_back(stepps[i]);
-				int whereToCut = stepps[i]->getPos();
-				if (whereToCut > baseVect[vectCounter]->getWidth() || whereToCut < 0) {
-					std::cout << "problem2" << std::endl;
-					whereToCut = getRandom(0, baseVect[vectCounter]->getWidth());
-				}
-
-				std::vector<Base*> temp = baseVect[vectCounter++]->verticalCut(whereToCut, cutWidth);
-				if (temp.size() > 0) {
-					newBaseVect.push_back(temp[0]);
-				}
-				if (temp.size() > 1) {
-					newBaseVect.push_back(temp[1]);
-				}
-
-
-			}
-			if (i == (stepps.size() - 1)) {
+			//std::cout << "itt a hiba" << std::endl;
+			
+			/*if (i == (stepps.size() - 1)) {
 				for (int j = vectCounter; j < baseVect.size(); j++) {
 					std::cout << "Van mit belepusholni" << std::endl;
 					newBaseVect.push_back(baseVect[j]);
 				}
 				vectCounter = 0;
-				/*for (auto a : baseVect) {
-					delete a;
-				}*/
 				baseVect.clear();
 				baseVect = newBaseVect;
-				/*for (auto a : newBaseVect) {
-					delete a;
-				}*/
 				newBaseVect.clear();
-			}
-			if (vectCounter >= baseVect.size()) {
-
+			}*/
+			if (stepps[i]->getBorder()==true) {
+				std::cout << "BORDER" << std::endl;
 
 				vectCounter = 0;
 				baseVect.clear();
 				baseVect = newBaseVect;
+				
 
+				
+				
+				
 				newBaseVect.clear();
 
+				
 
 			}
+			
 
 		}
 

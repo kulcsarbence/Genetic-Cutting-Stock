@@ -38,15 +38,15 @@ int main(int argc, char* argv[])
 	
 	
 	//Kitorlunk mindent a ready mappabol
-	/*std::string command = "del /Q ";
+	std::string command = "del /Q ";
 	std::string cur_dir(argv[0]);
 	int pos = cur_dir.find_last_of("/\\");
-	std::string path = cur_dir.substr(0, pos) + "\\ready\\*.svg";
-	system(command.append(path).c_str());*/
+	std::string path = cur_dir.substr(0, pos) + "\\*.svg";
+	std::cout << path << std::endl;
+	system(command.append(path).c_str());
 	//vege a torlesnek
 
 	int ratio;
-	int populationSize = 500;
 	int mutationChanceC = 0;
 	int generation = 0;
 	std::ifstream basicInput("exchange.txt");
@@ -57,6 +57,10 @@ int main(int argc, char* argv[])
 	int hh = std::stoi(line);
 	std::getline(basicInput, line);
 	int cutWidth = std::stoi(line);
+	std::getline(basicInput, line);
+	int populationSize = std::stoi(line);
+	std::getline(basicInput, line);
+	int genS = std::stoi(line);
 	basicInput.close();
 	
 	Base* alap = new Base(ww, hh, 0, 0);
@@ -141,7 +145,7 @@ int main(int argc, char* argv[])
 	std::vector<Entity*> newGen;
 
 	//while (fittestValue < theseToBeCut.size()) {
-	while((readyPop.size()<=populationSize/2 && generation<60)){
+	while((/*readyPop.size()<=populationSize/2 && */generation<genS)){
 
 
 		int chosenEntityPos = 0;
@@ -240,7 +244,7 @@ int main(int argc, char* argv[])
 		std::cout << leastfitPos << std::endl;
 		std::cout << leastfitValue << std::endl;
 		
-		std::cout << "StepSize " << population[fittestPos]->getSteps().size() << std::endl;;
+		std::cout << "StepSize " << population[fittestPos]->getSteps().size() << std::endl;
 
 
 		std::ofstream file;
@@ -283,11 +287,13 @@ int main(int argc, char* argv[])
 	}
 	std::cout << std::endl;
 	}*/
-	if (readyPop.size() > populationSize / 2) {
+	//
+	// ez
+	/*if (readyPop.size() > populationSize / 2) {
 		std::ofstream fileP("progress.txt");
-		fileP << std::to_string(101);
+		fileP << std::to_string(9999999);
 		fileP.close();
-	}
+	}*/
 
 	if(readyPop.size()>0){
 	for (auto a : readyPop) {
@@ -379,6 +385,8 @@ int main(int argc, char* argv[])
 	}
 	file3.close();
 	readyPop[fittestPos]->calculateFitness(true);
+	Entity* writeOut = new Entity(baseVector, cutWidth, theseToBeCut, cnt, ratio);
+	writeOut->makeCutsByGivenSteps(readyPop[fittestPos]->getSteps());
 	}
 	else {
 		std::cout << "nem vaghato ki" << std::endl;
@@ -386,6 +394,8 @@ int main(int argc, char* argv[])
 		file4 << std::to_string(-1);
 		file4.close();
 	}
+
+	
 	std::cout << "VEGE" << std::endl;
 
 	for (auto d : baseVector) {

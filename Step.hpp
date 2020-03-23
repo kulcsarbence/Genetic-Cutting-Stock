@@ -4,7 +4,7 @@
 class Step {
 	Base* whichBase;
 	int pos;
-	bool border = false;
+	bool border;
 public:
 	Step(Base*& which, int p, bool bord) : whichBase(which), pos(p), border(bord) {}
 	int getPos() {
