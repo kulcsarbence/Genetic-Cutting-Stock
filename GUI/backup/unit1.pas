@@ -749,7 +749,10 @@ begin
           areaToBeCut:= areaToBeCut + ( _tobecut[i].Width*_tobecut[i].height );
           end;
      setlength(sortstock, length(_stock));
+     if notFirst=false then
+     begin
      sortstock := _stock;
+     end;
      bubblesort(sortstock, length(sortstock));
      def.width:=0;
      def.height:=0;

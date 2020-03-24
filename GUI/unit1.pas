@@ -27,9 +27,7 @@ type
     ComboBox1: TComboBox;
     Edit1: TEdit;
     Edit2: TEdit;
-    Edit3: TEdit;
 
-    Edit4: TEdit;
     Image1: TImage;
     Label1: TLabel;
     Label2: TLabel;
