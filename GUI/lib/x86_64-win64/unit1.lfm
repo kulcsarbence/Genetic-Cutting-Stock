@@ -146,6 +146,11 @@ object Form1: TForm1
       'm'
     )
     OnChange = ComboBox1Change
+    OnClick = ComboBox1Click
+    OnKeyDown = ComboBox1KeyDown
+    OnMouseDown = ComboBox1MouseDown
+    OnMouseLeave = ComboBox1MouseLeave
+    OnSelect = ComboBox1Select
     ParentFont = False
     ParentShowHint = False
     TabOrder = 9
