@@ -2,9 +2,9 @@
 //
 
 #include "stdafx.h"
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
+//#define _CRTDBG_MAP_ALLOC
+//#include <stdlib.h>
+//#include <crtdbg.h>
 #include <vector>
 #include <iostream>
 #include <random>
@@ -21,7 +21,7 @@
 
 
 void fv() {
-	_CrtDumpMemoryLeaks();
+	//_CrtDumpMemoryLeaks();
 }
 
 
@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
 	//vege a torlesnek
 
 	int ratio;
-	int mutationChanceC = 0;
+	int mutationChanceC = 7;
 	int generation = 0;
 	std::ifstream basicInput("exchange.txt");
 	std::string line;

@@ -11,6 +11,7 @@ class Entity {
 	double wastePercentage;
 	int cutWidth;
 	int bigCounter = 0;
+	int stepVar;
 	int fitness = 0;
 	bool atMax = false;
 	//	int badCounter = 0;
@@ -35,11 +36,12 @@ public:
 		this->cnt = cnt;
 		ratio = r;
 		whichBasesToBeCut = whichToBeCut;
+		stepVar = 3;
 		//steps.clear();
 	}
 	Entity(Base* firstBaseVect, std::vector<Step*> stepss, int cutW, std::vector<Base*> whichToBeCut, std::vector<int> cnt, int r) : cutWidth(cutW) {
 		//steps.clear();
-
+		stepVar = 3;
 		ratio = r;
 		baseVect.push_back(firstBaseVect);
 		this->cnt = cnt;
@@ -55,9 +57,9 @@ public:
 		}
 		//calculateFitness();
 	}
-	Entity(Base*& firstBaseVect, std::vector<Base*>& baseVV, std::vector<Step*>& stepss, int cutW, std::vector<Base*>& whichToBeCut, std::vector<int> cnt, int r) : cutWidth(cutW) {
+	Entity(Base*& firstBaseVect, std::vector<Base*>& baseVV, std::vector<Step*>& stepss, int cutW, std::vector<Base*>& whichToBeCut, std::vector<int> cnt, int r, int s) : cutWidth(cutW) {
 		//steps.clear();
-
+		stepVar = s;
 		ratio = r;
 		baseVect.push_back(firstBaseVect);
 		this->cnt = cnt;
@@ -119,34 +121,17 @@ public:
 		}
 		//steps.clear();
 		//std::cout << "after" << std::endl;
-		toReturn = new Entity(firstBaseVect, baseVect, newSteps, cutWidth, whichBasesToBeCut, this->cnt, this->ratio);
+		toReturn = new Entity(firstBaseVect, baseVect, newSteps, cutWidth, whichBasesToBeCut, this->cnt, this->ratio, stepVar);
 		return toReturn;
 	}
 	void mutate() {
-
-		//HIBAS HIBAS HIBAS
-		std::vector<Step*> newSteps;
-		int whereMutate = getRandom(0, steps.size() - 1);
-		for (int i = 0; i <= whereMutate; i++) {
-			newSteps.push_back(steps[i]);
+		int od = getRandom(1, 2);
+		if (od == 2) {
+			stepVar = stepVar - 1;
 		}
-		if (dynamic_cast<HorizontalStep*>(newSteps[whereMutate]) != nullptr) {
-			newSteps[whereMutate]->setPos(getRandom(0, newSteps[whereMutate]->getBase()->getHeight()));
+		if (stepVar == 1 || od == 1) {
+			stepVar = stepVar + 1;
 		}
-		if (dynamic_cast<VerticalStep*>(newSteps[whereMutate]) != nullptr) {
-			newSteps[whereMutate]->setPos(getRandom(0, newSteps[whereMutate]->getBase()->getWidth()));
-		}
-		for (auto a : baseVect) {
-			delete a;
-		}
-		baseVect.clear();
-		baseVect.push_back(firstBaseVect);
-		for (auto a : steps) {
-			delete a;
-		}
-		steps.clear();
-		makeCutsByGivenSteps(newSteps);
-
 	}
 	void mutateStep() {
 		/*int whichStepToMutate = getRandom(0, steps.size() - 1);
@@ -263,7 +248,7 @@ public:
 	}
 	void makeCutsByGivenSteps(std::vector<Step*> stepps) {
 		std::vector<Base*> newBaseVect;
-
+		
 		int vectCounter = 0;
 		int someCounter = 0;
 
@@ -358,7 +343,7 @@ public:
 						<< "height=\"" << a->getHeight() << "\" " <<
 						"style=\"fill:" << (a->getAccepted() == true ? "red" : "blue") << "; stroke:pink; stroke - width:1; fill - opacity:0.1; stroke - opacity:0.9\" />";
 				}
-				file << " <text x=\"0\" y=\"15\" fill=\"white\">" << "Waste percentage: " << wastePercentage << "%" << "</text> ";
+				//file << " <text x=\"0\" y=\"15\" fill=\"white\">" << "Waste percentage: " << wastePercentage << "%" << "</text> ";
 
 				file << "</svg>";
 				file.close();
@@ -395,6 +380,15 @@ public:
 			
 
 		}
+		File rem{ "remaining.csv" };
+		std::vector<Base*> remaining;
+		for (auto a : baseVect) {
+			if (a->getAccepted() == false) {
+				remaining.push_back(a);
+			}
+		}
+		rem.writeStockToCSV(remaining);
+
 
 
 	}
@@ -415,7 +409,7 @@ public:
 				delete a;
 			}
 			temp.clear();
-			int whichStep = getRandom(1, 3); //1 - horizontal, 2 - vertical, 3 - no cut
+			int whichStep = getRandom(1, stepVar); //1 - horizontal, 2 - vertical, 3 - no cut
 			if (alreadyCut >= howMuchToCut) {
 				whichStep = 3;
 			}
@@ -428,9 +422,9 @@ public:
 				) {
 				whichStep = 3;
 			}
-			if (baseVect[i]->getHeight() <= 2 * cutWidth || baseVect[i]->getWidth() <= 2 * cutWidth) {
+			/*if (baseVect[i]->getHeight() <= 2 * cutWidth || baseVect[i]->getWidth() <= 2 * cutWidth) {
 				whichStep = 3;
-			}
+			}*/
 			if (baseVect[i]->getAccepted() == true) {
 				whichStep = 3;
 				/*if (getRandom(1, 100) == 50) {
