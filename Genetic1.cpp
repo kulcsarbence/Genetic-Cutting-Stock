@@ -189,11 +189,14 @@ int main(int argc, char* argv[])
 			if(newGen[j]->getatMax()==false){
 				int before = newGen[j]->getFitness();
 				int befSize = newGen[j]->getBaseVect().size();
+				for(int q = 0; q<getRandom(1,theseToBeCut.size()) && newGen[j]->getatMax()==false; q++){
+				newGen[j]->calculateFitness(false);
 				newGen[j]->makeCuts();
 				newGen[j]->calculateFitness(false);
+				}
 				int after = newGen[j]->getFitness();
 				int afSize = newGen[j]->getBaseVect().size();
-				if (after <= before && (newGen[j]->getBaseVect().size() >= 2 * theseToBeCut.size() || (afSize<=befSize && newGen[j]->getBaseVect().size()>=(theseToBeCut.size()/2) ) )) {
+				if (after <= before && (newGen[j]->getBaseVect().size() >= 3 * theseToBeCut.size() ) && getRandom(1,12)==5) {
 					//std::cout << "baseVectSize: " << newGen[j]->getBaseVect().size() << "\t theseToBeCut size: " << theseToBeCut.size() << std::endl;
 					newGen[j] = new Entity(baseVector, cutWidth, theseToBeCut, cnt, ratio);
 					newGen[j]->calculateFitness(false);

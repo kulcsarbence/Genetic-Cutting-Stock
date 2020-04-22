@@ -185,7 +185,7 @@ public:
 					break;
 				}
 			}
-			if (cnter <= whichBasesToBeCut.size() && index <= cnt.size() - 1) {
+			if (cnter <= whichBasesToBeCut.size() && index <= cnt.size() -1) {
 				temp = 0;
 				for (int r = 0; r < index + 1; r++) {
 					temp += cnt[r];
@@ -403,7 +403,7 @@ public:
 		int alreadyCut = 0;
 		for (int i = 0; i < baseVect.size(); i++) {
 
-
+			//std::cout << "eztet e   "<< whichBasesToBeCut[bigCounter]->getHeight() << std::endl;
 			std::vector<Base*> temp;
 			for (auto a : temp) {
 				delete a;
@@ -418,10 +418,14 @@ public:
 			int baseW = baseVect[i]->getWidth();
 			int baseH = baseVect[i]->getHeight();
 			if (
-				((baseW < toBeCutW || baseH < toBeCutH) && (baseH < toBeCutW || baseW < toBeCutW))
+				((baseW < toBeCutW || baseH < toBeCutH) && (baseW < toBeCutH || baseH < toBeCutW))
 				) {
 				whichStep = 3;
 			}
+			/*if ((baseW == whichBasesToBeCut[bigCounter]->getWidth() && baseH == whichBasesToBeCut[bigCounter]->getHeight()) ||
+				(baseW == whichBasesToBeCut[bigCounter]->getHeight() && baseH == whichBasesToBeCut[bigCounter]->getWidth())) {
+				whichStep = 3;
+			}*/
 			/*if (baseVect[i]->getHeight() <= 2 * cutWidth || baseVect[i]->getWidth() <= 2 * cutWidth) {
 				whichStep = 3;
 			}*/
@@ -433,7 +437,7 @@ public:
 				}*/
 
 			}
-			int whereToCut;
+			int whereToCut = 0;
 			if (whichStep == 1) {
 
 				int melyik = getRandom(0, 1);
@@ -469,6 +473,7 @@ public:
 					}
 				}
 			}
+			//std::cout << "wheretocut " << whereToCut << std::endl;
 			if (whichStep == 1) {
 				/*int whereToCut = getRandom(0, (int)baseVect[i]->getHeight()/ratio);
 				while ((whereToCut*ratio + cutWidth) >= (baseVect[i]->getHeight()))
@@ -554,7 +559,7 @@ public:
 			}
 
 
-
+			
 
 		}
 
