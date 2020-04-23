@@ -24,6 +24,8 @@ type
     Button5: TButton;
     Button6: TButton;
     Button7: TButton;
+    Button8: TButton;
+    Button9: TButton;
     ComboBox1: TComboBox;
     Edit1: TEdit;
     Edit2: TEdit;
@@ -31,11 +33,14 @@ type
     Image1: TImage;
     Label1: TLabel;
     Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
     ListBox1: TListBox;
     ListBox2: TListBox;
     Memo1: TMemo;
     ProgressBar1: TProgressBar;
     Timer1: TTimer;
+    Timer2: TTimer;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -43,6 +48,8 @@ type
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
+    procedure Button8Click(Sender: TObject);
+    procedure Button9Click(Sender: TObject);
     procedure ComboBox1Change(Sender: TObject);
     procedure ComboBox1Click(Sender: TObject);
     procedure ComboBox1KeyDown(Sender: TObject; var Key: Word;
@@ -58,6 +65,7 @@ type
     procedure Timer1Timer(Sender: TObject);
     Procedure BubbleSort(var numbers : Array of Rectangle; size : Integer);
     function KillTask(ExeFileName: string): Integer;
+    procedure Timer2Timer(Sender: TObject);
   private
 
   public
@@ -99,6 +107,8 @@ var
   f: textfile;
 
 begin
+     Label3.Visible := False;
+     Label4.Visible := False;
      KillTask('Genetic1.exe');
      AssignFile(f, 'progress.txt');
      Rewrite(f);
@@ -112,6 +122,7 @@ begin
      //beolvasasa a kivagando elemeknek es a keszlet elemeknek
      AssignFile(stock,'stock.csv');
      Reset(stock);
+
      //ComboBox csak valaszthato legyen
      ComboBox1.Style := csDropDownList;
      //ComboBox vege
@@ -1763,7 +1774,6 @@ var
   areaStock: integer;
   def: rectangle;
 begin
-     ShowMessage('click');
      //copypasta
      //ListBox1.Clear;
      //ListBox2.Clear;
@@ -1841,7 +1851,7 @@ begin
      //kivalasztjuk a legmegfelelobb lapot, ha nem sikerul akkor egy masikat valasztunk
      if notFirst=true then
      begin
-          ShowMessage('Valasztunk egy masik lapot, ami lehetoleg megfelelobb...');
+          ShowMessage('Választunk egy másik lapot, ami lehetőleg megfelelőbb a vágásra...');
      end;
      areatobecut := 0;
      for i:=0 to length(_tobecut)-1 do
@@ -1866,18 +1876,20 @@ begin
               end;
               areaStock:=(sortstock[j].width*sortstock[j].height);
               //ShowMessage(IntToStr(areastock)+' >= '+IntToStr(areatobecut));
-              if (sortstock[j].alreadyWas=false) and ( areaStock>=areatobecut ) then
+              if (sortstock[j].alreadyWas=false) and ( areaStock>areatobecut ) then
               begin
                    sortstock[j].alreadyWas:=True;
                    selected:=sortstock[j];
                    chosenitemstring:=inttostr(selected.width) + ', '+inttostr(selected.height);
-                   showmessage(inttostr(selected.width)+', '+inttostr(selected.height));
+                   Label3.Visible := True;
+                   Label4.Visible := True;
+                   Label4.Caption := inttostr(selected.width)+', '+inttostr(selected.height);
                    Break;
               end;
          end;
      if selected.width=0 then
      begin
-        ShowMessage('Nincs megfelelo meretu elem a keszletben!');
+        ShowMessage('Nincs megfelelő méretű elem a készletben!');
      //vege a kivalasztasnak
      end
      else
@@ -1888,7 +1900,7 @@ begin
      Button6.Enabled:=False;
      if notFirst=false then
      begin
-     cutWidth:=StrToint(inputbox('Vágási szélesség', 'Mi legyen a vágási szélesség (mm-ben ertendo)? Kérem egész számot adjon meg!', '1'));
+     cutWidth:=StrToint(inputbox('Vágási szélesség', 'Mi legyen a vágási szélesség (mm-ben értendő)? Kérem egész számot adjon meg!', '1'));
      end;
      AssignFile(ex, 'exchange.txt');
      Rewrite(ex);
@@ -1910,6 +1922,159 @@ begin
      Timer1.Enabled := True;
      end;
 
+end;
+
+procedure TForm1.Button8Click(Sender: TObject);   //keszlet minden torlese
+var
+  stock: TextFile;
+  i, counter: Integer;
+  line,listboxline: ansistring;
+  list: TStringList;
+  f: textfile;
+
+begin
+     ListBox1.Clear;
+     ListBox2.Clear;
+     AssignFile(f, 'stock.csv');
+     Rewrite(f);
+     CloseFile(f);
+     //DrawFPVectorialToCanvas('teszt.svg',Image1.Canvas);
+     //beolvasasa a kivagando elemeknek es a keszlet elemeknek
+     AssignFile(stock,'stock.csv');
+     Reset(stock);
+     //ComboBox csak valaszthato legyen
+     ComboBox1.Style := csDropDownList;
+     //ComboBox vege
+     counter:=0;
+     while not Eof(stock) do
+     begin
+      listboxline:='';
+      list := TStringList.Create();
+      ReadLn(stock,line);
+      try
+         list.CommaText := line;
+         listboxline:=listboxline+list[0]+', ';
+         listboxline:=listboxline+list[1];
+         for i:=1 to StrToInt(list[2]) do
+         begin
+             counter:=counter+1;
+             setLength(_stock, counter);
+             _stock[counter-1].Width:=StrToInt(list[0]);
+             _stock[counter-1].Height:=StrToInt(list[1]);
+             _stock[counter-1].alreadywas:=false;
+             ListBox1.Items.Add(listboxline);
+         end;
+      finally
+         list.Free;
+      end;
+     end;
+     CloseFile(stock);
+
+     counter:=0;
+
+
+     AssignFile(stock,'tobecut.csv');
+     Reset(stock);
+     ComboBox1.Style := csDropDownList;
+     while not Eof(stock) do
+     begin
+      listboxline:='';
+      list := TStringList.Create();
+      ReadLn(stock,line);
+      try
+         list.CommaText := line;
+         listboxline:=listboxline+list[0]+', ';
+         listboxline:=listboxline+list[1];
+         for i:=1 to StrToInt(list[2]) do
+         begin
+              counter:=counter+1;
+             setLength(_tobecut, counter);
+             _tobecut[counter-1].Width:=StrToInt(list[0]);
+             _tobecut[counter-1].Height:=StrToInt(list[1]);
+             _tobecut[counter-1].alreadyWas:=false;
+             ListBox2.Items.Add(listboxline);
+         end;
+      finally
+         list.Free;
+      end;
+     end;
+     CloseFile(stock);
+     //beolvasas vege
+end;
+
+procedure TForm1.Button9Click(Sender: TObject);    //kivagandokbol minden torlese
+var
+  stock: TextFile;
+  i, counter: Integer;
+  line,listboxline: ansistring;
+  list: TStringList;
+  f: textfile;
+
+begin
+     AssignFile(f, 'tobecut.csv');
+     Rewrite(f);
+     CloseFile(f);
+     ListBox1.Clear;
+     ListBox2.Clear;
+     //DrawFPVectorialToCanvas('teszt.svg',Image1.Canvas);
+     //beolvasasa a kivagando elemeknek es a keszlet elemeknek
+     AssignFile(stock,'stock.csv');
+     Reset(stock);
+     counter:=0;
+     while not Eof(stock) do
+     begin
+      listboxline:='';
+      list := TStringList.Create();
+      ReadLn(stock,line);
+      try
+         list.CommaText := line;
+         listboxline:=listboxline+list[0]+', ';
+         listboxline:=listboxline+list[1];
+         for i:=1 to StrToInt(list[2]) do
+         begin
+             counter:=counter+1;
+             setLength(_stock, counter);
+             _stock[counter-1].Width:=StrToInt(list[0]);
+             _stock[counter-1].Height:=StrToInt(list[1]);
+             _stock[counter-1].alreadywas:=false;
+             ListBox1.Items.Add(listboxline);
+         end;
+      finally
+         list.Free;
+      end;
+     end;
+     CloseFile(stock);
+
+     counter:=0;
+
+
+     AssignFile(stock,'tobecut.csv');
+     Reset(stock);
+     ComboBox1.Style := csDropDownList;
+     while not Eof(stock) do
+     begin
+      listboxline:='';
+      list := TStringList.Create();
+      ReadLn(stock,line);
+      try
+         list.CommaText := line;
+         listboxline:=listboxline+list[0]+', ';
+         listboxline:=listboxline+list[1];
+         for i:=1 to StrToInt(list[2]) do
+         begin
+              counter:=counter+1;
+             setLength(_tobecut, counter);
+             _tobecut[counter-1].Width:=StrToInt(list[0]);
+             _tobecut[counter-1].Height:=StrToInt(list[1]);
+             _tobecut[counter-1].alreadyWas:=false;
+             ListBox2.Items.Add(listboxline);
+         end;
+      finally
+         list.Free;
+      end;
+     end;
+     CloseFile(stock);
+     //beolvasas vege
 end;
 
 procedure TForm1.ComboBox1Change(Sender: TObject);
@@ -2252,13 +2417,103 @@ begin
   CloseHandle(FSnapshotHandle);
 end;
 
+
+
+procedure TForm1.Timer2Timer(Sender: TObject);
+var
+  stock: TextFile;
+  i,p, counter: Integer;
+  line: ansistring;
+  list: TStringList;
+  f: textfile;
+  sstock: array of rectangle;
+  ttobecut: array of rectangle;
+
+begin
+  If (ListBox1.SelCount > 0) or (ListBox2.SelCount>0) then
+  begin
+
+  end
+  else
+  begin
+  Timer2.Interval := 1000;
+     ListBox1.Clear;
+     ListBox2.Clear;
+     //DrawFPVectorialToCanvas('teszt.svg',Image1.Canvas);
+     //beolvasasa a kivagando elemeknek es a keszlet elemeknek
+     AssignFile(stock,'stock.csv');
+     Reset(stock);
+     counter:=0;
+     while not Eof(stock) do
+     begin
+      list := TStringList.Create();
+      ReadLn(stock,line);
+      try
+         list.CommaText := line;
+         for i:=1 to StrToInt(list[2]) do
+         begin
+             counter:=counter+1;
+             setlength(sstock,counter);
+             sstock[counter-1].width := StrToInt(list[0]);
+             sstock[counter-1].height := StrToInt(list[1]);
+             sstock[counter-1].alreadywas := false;
+             //ListBox1.Items.Add(listboxline);
+         end;
+      finally
+         list.Free;
+      end;
+     end;
+     CloseFile(stock);
+
+     bubblesort(sstock, counter);
+     for p:=1 to counter do
+     begin
+          ListBox1.Items.Add(IntToStr(sstock[p-1].width) + ', ' + IntToStr(sstock[p-1].height));
+     end;
+     counter:=0;
+
+
+     AssignFile(stock,'tobecut.csv');
+     Reset(stock);
+     ComboBox1.Style := csDropDownList;
+     while not Eof(stock) do
+     begin
+      list := TStringList.Create();
+      ReadLn(stock,line);
+      try
+         list.CommaText := line;
+         for i:=1 to StrToInt(list[2]) do
+         begin
+              counter:=counter+1;
+             setLength(ttobecut, counter);
+             ttobecut[counter-1].Width:=StrToInt(list[0]);
+             ttobecut[counter-1].Height:=StrToInt(list[1]);
+             ttobecut[counter-1].alreadyWas:=false;
+             //ListBox2.Items.Add(listboxline);
+         end;
+      finally
+         list.Free;
+      end;
+     end;
+     CloseFile(stock);
+
+     bubblesort(ttobecut, counter);
+     for p:=1 to counter do
+     begin
+          ListBox2.Items.Add(IntToStr(ttobecut[p-1].width) + ', ' + IntToStr(ttobecut[p-1].height));
+     end;
+     //beolvasas vege
+end;
+
+end;
+
 procedure TForm1.Timer1Timer(Sender: TObject);   //Timer a ProgressBarhoz
 var
   wwidth,hheight,count: integer;
   stock: TextFile;
   Reply, BoxStyle: Integer;
   rem: textfile;
-  counter: integer;
+  counter,p: integer;
   faktor: integer;
   found: boolean;
   whichLine,i: integer;
@@ -2318,7 +2573,7 @@ begin
 
        if (StrToInt(line)=9999999) then
        begin
-            ShowMessage('Talaltunk megoldast!');
+            //ShowMessage('Talaltunk megoldast!');
             while not Sysutils.FileExists('temp'+IntToStr(vall-1)+'.svg') do
              begin
                   sleep(50);
@@ -2328,6 +2583,30 @@ begin
              Rewrite(f2);
              Writeln(f2, '0');
              CloseFile(f2);
+            notFirst:=false;
+            ProgressBar1.Position:=StrToInt(Edit2.text);
+            Button5.Enabled:=True;
+
+            Button6.Enabled:=False;
+            AssignFile(step, 'steps.csv');
+            Reset(step);
+            while not eof(step) do
+            begin
+             ReadLn(step,line2);
+            end;
+            list := TStringList.Create();
+            try
+               list.CommaText := line2;
+               stepSize:=StrToint(list[0]);
+            finally
+               list.Free;
+            end;
+            CloseFile(step);
+            for p:=1 to stepSize do
+            begin
+             Button5.Click;
+             Sleep(75);
+            end;
              BoxStyle := MB_ICONQUESTION + MB_YESNO;
   Reply := Application.MessageBox('Elmentsuk a jelenlegi allapotot, azaz a megmaradt elemek bekeruljenek a stockba?','Mentes' , BoxStyle);
   if Reply = IDYES then
@@ -3009,6 +3288,49 @@ begin
   end;
 
              end;
+
+            if stepSize=1 then
+             begin
+               Button5.Enabled := False;
+             end;
+       end;
+       if (StrToint(line)=-1) then
+       begin
+            ShowMessage('Nem találtunk megoldást!');
+            AssignFile(f2, 'progress.txt');
+             Rewrite(f2);
+             Writeln(f2, '0');
+             CloseFile(f2);
+            KillTask('Genetic1.exe');
+
+            if theend=false then
+            begin
+            showmessage('folytatódik');
+            notFirst:=true;
+            Button7.Click;
+
+            end
+            else
+            begin
+            theend:=false;
+            notfirst:=false;
+            end;
+            stepSize:=0;
+            stepCount := 0;
+       end;
+       if  (StrToInt(line)=(StrToInt(Edit2.text)-1)) then
+       begin
+            //ShowMessage('Találtunk megoldást!');
+             while not Sysutils.FileExists('temp'+IntToStr(vall-1)+'.svg') do
+             begin
+                  sleep(50);
+             end;
+             KillTask('Genetic1.exe');
+            AssignFile(f2, 'progress.txt');
+             Rewrite(f2);
+             Writeln(f2, '0');
+             CloseFile(f2);
+
             notFirst:=false;
             ProgressBar1.Position:=StrToInt(Edit2.text);
             Button5.Enabled:=True;
@@ -3027,48 +3349,20 @@ begin
                list.Free;
             end;
             CloseFile(step);
-       end;
-       if (StrToint(line)=-1) then
-       begin
-            ShowMessage('Nem talaltunk megoldast!');
-            AssignFile(f2, 'progress.txt');
-             Rewrite(f2);
-             Writeln(f2, '0');
-             CloseFile(f2);
-            KillTask('Genetic1.exe');
 
-            if theend=false then
+            for p:=1 to stepSize do
             begin
-            showmessage('folytatodik');
-            notFirst:=true;
-            Button7.Click;
-
-            end
-            else
-            begin
-            theend:=false;
-            notfirst:=false;
+             Button5.Click;
+             Sleep(75);
             end;
-            stepSize:=0;
-            stepCount := 0;
-       end;
-       if  (StrToInt(line)=(StrToInt(Edit2.text)-1)) then
-       begin
-            ShowMessage('Talaltunk megoldast!');
-             while not Sysutils.FileExists('temp'+IntToStr(vall-1)+'.svg') do
+            if stepSize=1 then
              begin
-                  sleep(50);
+               Button5.Enabled := False;
              end;
-             KillTask('Genetic1.exe');
-            AssignFile(f2, 'progress.txt');
-             Rewrite(f2);
-             Writeln(f2, '0');
-             CloseFile(f2);
-             BoxStyle := MB_ICONQUESTION + MB_YESNO;
+            BoxStyle := MB_ICONQUESTION + MB_YESNO;
   Reply := Application.MessageBox('Elmentsuk a jelenlegi allapotot, azaz a megmaradt elemek bekeruljenek a stockba?','Mentes' , BoxStyle);
   if Reply = IDYES then
              begin
-                  ShowMessage(chosenitemstring);
                  AssignFile(rem, 'tobecut.csv');
                   Rewrite(rem);
                   CloseFile(rem);
@@ -3745,24 +4039,6 @@ begin
   end;
 
              end;
-            notFirst:=false;
-            ProgressBar1.Position:=StrToInt(Edit2.text);
-            Button5.Enabled:=True;
-            Button6.Enabled:=False;
-            AssignFile(step, 'steps.csv');
-            Reset(step);
-            while not eof(step) do
-            begin
-             ReadLn(step,line2);
-            end;
-            list := TStringList.Create();
-            try
-               list.CommaText := line2;
-               stepSize:=StrToint(list[0]);
-            finally
-               list.Free;
-            end;
-            CloseFile(step);
        end;
      end;
 end;

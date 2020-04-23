@@ -1,10 +1,10 @@
 object Form1: TForm1
-  Left = 239
-  Height = 491
-  Top = 117
+  Left = 242
+  Height = 527
+  Top = 122
   Width = 912
   Caption = 'Lapszabászati program v0.1'
-  ClientHeight = 491
+  ClientHeight = 527
   ClientWidth = 912
   OnClose = FormClose
   OnCreate = FormCreate
@@ -91,8 +91,8 @@ object Form1: TForm1
     TabOrder = 5
   end
   object Button5: TButton
-    Left = 632
-    Height = 25
+    Left = 629
+    Height = 27
     Top = 416
     Width = 75
     Caption = '-->'
@@ -105,7 +105,7 @@ object Form1: TForm1
   end
   object Button6: TButton
     Left = 552
-    Height = 25
+    Height = 27
     Top = 416
     Width = 75
     Caption = '<--'
@@ -118,9 +118,9 @@ object Form1: TForm1
   end
   object Button7: TButton
     Left = 304
-    Height = 25
+    Height = 26
     Top = 416
-    Width = 187
+    Width = 240
     Caption = 'Megoldás keresése'
     OnClick = Button7Click
     ParentFont = False
@@ -158,7 +158,7 @@ object Form1: TForm1
   end
   object Memo1: TMemo
     Left = 712
-    Height = 346
+    Height = 347
     Top = 96
     Width = 190
     Lines.Strings = (
@@ -170,7 +170,7 @@ object Form1: TForm1
   object ProgressBar1: TProgressBar
     Left = 8
     Height = 40
-    Top = 448
+    Top = 480
     Width = 895
     ParentFont = False
     TabOrder = 11
@@ -182,7 +182,7 @@ object Form1: TForm1
     Width = 188
     ParentFont = False
     TabOrder = 12
-    Text = '500'
+    Text = '150'
   end
   object Edit2: TEdit
     Left = 712
@@ -191,7 +191,50 @@ object Form1: TForm1
     Width = 188
     ParentFont = False
     TabOrder = 13
-    Text = '60'
+    Text = '10'
+  end
+  object Button8: TButton
+    Left = 7
+    Height = 25
+    Top = 448
+    Width = 132
+    Caption = 'Minden törlése'
+    OnClick = Button8Click
+    TabOrder = 14
+  end
+  object Button9: TButton
+    Left = 160
+    Height = 25
+    Top = 448
+    Width = 131
+    Caption = 'Minden törlése'
+    OnClick = Button9Click
+    TabOrder = 15
+  end
+  object Label3: TLabel
+    Left = 304
+    Height = 21
+    Top = 448
+    Width = 136
+    Caption = 'Kiválasztott elem:'
+    Font.Height = -16
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+    Visible = False
+  end
+  object Label4: TLabel
+    Left = 448
+    Height = 21
+    Top = 448
+    Width = 287
+    Caption = 'Kiválasztott elem mérete és nagysága'
+    Font.Color = clBlue
+    Font.Height = -16
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+    Visible = False
   end
   object Timer1: TTimer
     Enabled = False
@@ -199,5 +242,11 @@ object Form1: TForm1
     OnTimer = Timer1Timer
     left = 143
     top = 102
+  end
+  object Timer2: TTimer
+    Interval = 5
+    OnTimer = Timer2Timer
+    left = 143
+    top = 175
   end
 end

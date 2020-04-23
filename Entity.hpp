@@ -387,7 +387,14 @@ public:
 				remaining.push_back(a);
 			}
 		}
-		rem.writeStockToCSV(remaining);
+		if(remaining.size()>0){
+			rem.writeStockToCSV(remaining);
+		}
+		else {
+			std::ofstream outf{ "remaining.csv" };
+			outf << "";
+			outf.close();
+		}
 
 
 
