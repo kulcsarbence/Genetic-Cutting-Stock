@@ -3,7 +3,7 @@ object Form1: TForm1
   Height = 527
   Top = 122
   Width = 912
-  Caption = 'Lapszabászati program v0.1'
+  Caption = 'Lapszabászati program v0.2'
   ClientHeight = 527
   ClientWidth = 912
   OnClose = FormClose

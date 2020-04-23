@@ -1773,6 +1773,8 @@ var
   selected: Rectangle;
   areaStock: integer;
   def: rectangle;
+  s: string;
+  ii, uu: integer;
 begin
      //copypasta
      //ListBox1.Clear;
@@ -1900,7 +1902,10 @@ begin
      Button6.Enabled:=False;
      if notFirst=false then
      begin
-     cutWidth:=StrToint(inputbox('Vágási szélesség', 'Mi legyen a vágási szélesség (mm-ben értendő)? Kérem egész számot adjon meg!', '1'));
+       repeat
+       s:=(inputbox('Vágási szélesség', 'Mi legyen a vágási szélesség (mm-ben értendő)? Kérem egész számot adjon meg!', '1'));
+        val(s,cutWidth,uu);
+       until ((uu=0) and (cutWidth>=0) and (cutWidth>MaxInt)) ;
      end;
      AssignFile(ex, 'exchange.txt');
      Rewrite(ex);
