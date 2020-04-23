@@ -6,7 +6,7 @@ An evolutionary algorithm for solving the two dimensional cutting stock problem.
 This program was written for the "Projektmunka 1" course at Széchenyi István University, Győr, Hungary.
 
 ## How to use it?
-The current version is `0.1` alpha. **I don't recommend using the algorithm for any essential work yet.**
+The current version is `0.2` alpha. **I don't recommend using the algorithm for any essential work yet.**
 If you want to check out the current version, I recommend you following these steps:
 - Download the **GUI folder** of this repository.
 - Start the `Project1.exe` file.
