@@ -147,17 +147,16 @@ int main(int argc, char* argv[])
 	//while (fittestValue < theseToBeCut.size()) {
 	while((/*readyPop.size()<=populationSize/2 && */generation<genS)){
 
-
 		int chosenEntityPos = 0;
 
 		for (int k = 0; k < population.size(); k++) {
 			bool canMate = false;
+			bool hiba = false;
 			chosenEntityPos = 0;
 			int counter = 0;
-			while (!canMate || population[chosenEntityPos]->getatMax() == true) {
+			while (!hiba && (!canMate || population[chosenEntityPos]->getatMax() == true)) {
 
 				chosenEntityPos = getRandom(0, population.size() -1);
-
 				/*if (population[chosenEntityPos]->getFitness() >=
 				getRandom(std::round(fittestValue - fittestValue / 10), fittestValue)
 				) {
@@ -174,11 +173,16 @@ int main(int argc, char* argv[])
 				counter++;
 				if (counter > population.size() * 10) {
 					canMate = true;
+					hiba = true;
 				}
 
 			}
-			
+			if (!hiba) {
 				newGen.push_back(population[chosenEntityPos]->reproduce());
+			}
+			else {
+				newGen.push_back(new Entity(baseVector, cutWidth, theseToBeCut, cnt, ratio));
+			}
 			
 		}
 

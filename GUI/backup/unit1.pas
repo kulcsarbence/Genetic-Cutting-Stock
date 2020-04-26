@@ -18,6 +18,8 @@ type
 
   TForm1 = class(TForm)
     Button1: TButton;
+    Button10: TButton;
+    Button11: TButton;
     Button2: TButton;
     Button3: TButton;
     Button4: TButton;
@@ -27,20 +29,26 @@ type
     Button8: TButton;
     Button9: TButton;
     ComboBox1: TComboBox;
-    Edit1: TEdit;
-    Edit2: TEdit;
 
     Image1: TImage;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    Label9: TLabel;
     ListBox1: TListBox;
     ListBox2: TListBox;
     Memo1: TMemo;
     ProgressBar1: TProgressBar;
     Timer1: TTimer;
     Timer2: TTimer;
+    TrackBar1: TTrackBar;
+    procedure Button10Click(Sender: TObject);
+    procedure Button11Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -66,6 +74,9 @@ type
     Procedure BubbleSort(var numbers : Array of Rectangle; size : Integer);
     function KillTask(ExeFileName: string): Integer;
     procedure Timer2Timer(Sender: TObject);
+    procedure TrackBar1Change(Sender: TObject);
+    procedure TrackBar1MouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
   private
 
   public
@@ -83,6 +94,8 @@ var
   chosenItemString: ansistring;
    _stock: array of Rectangle;
    _tobecut: array of Rectangle;
+   populacio: integer;
+   generacio: integer;
 implementation
 
 {$R *.lfm}
@@ -107,6 +120,28 @@ var
   f: textfile;
 
 begin
+  If TrackBar1.Position=1 then
+  begin
+       populacio := 30;
+       generacio := 5;
+  end;
+   If TrackBar1.Position=2 then
+  begin
+      populacio := 30;
+       generacio := 10;
+  end;
+    If TrackBar1.Position=3 then
+  begin
+     populacio := 30;
+       generacio := 25;
+  end;
+     If TrackBar1.Position=4 then
+  begin
+     populacio := 30;
+       generacio := 60;
+  end;
+  Button11.Enabled := False;
+     Button10.Enabled := False;
      Label3.Visible := False;
      Label4.Visible := False;
      KillTask('Genetic1.exe');
@@ -192,15 +227,26 @@ var
   counter: integer;
   faktor: integer;
   found: boolean;
-  whichLine,i: integer;
+  s:string;
+  whichLine,i,uu: integer;
   list,F,SL: TStringList;
   line,listboxline: ansistring;
 begin
 
    //Hozzadas a keszlethez!
-     wwidth := StrToInt(InputBox('Szélesség','Kérem adja meg egész számban kifejezve a SZÉLESSÉGET!',''));
-     hheight := StrToInt(InputBox('Szélesség','Kérem adja meg egész számban kifejezve a MAGASSÁGOT!',''));
-     count := StrToInt(InputBox('Szélesség','Kérem adja meg egész számban kifejezve a DARABSZÁMOT!',''));
+     repeat
+       s:=InputBox('Szélesség','Kérem adja meg egész számban kifejezve a SZÉLESSÉGET!','');
+        val(s,wwidth,uu);
+       until ((uu=0) and (wwidth>=0) and (wwidth<MaxInt)) ;
+       repeat
+       s:=InputBox('Szélesség','Kérem adja meg egész számban kifejezve a MAGASSÁGOT!','');
+        val(s,hheight,uu);
+       until ((uu=0) and (hheight>=0) and (hheight<MaxInt)) ;
+       repeat
+       s:=InputBox('Szélesség','Kérem adja meg egész számban kifejezve a DARABSZÁMOT!','');
+        val(s,count,uu);
+       until ((uu=0) and (count>=0) and (count<MaxInt)) ;
+
      AssignFile(stock,'stock.csv');
      Reset(stock);
      found:=false;
@@ -528,6 +574,78 @@ begin
      CloseFile(stock);
      //beolvasas vege
   end;
+  If (ListBox1.Count<=0) or (ListBox2.Count<=0) then
+       begin
+          Button7.Enabled := False;
+       end
+    else
+    begin
+     Button7.Enabled := True;
+    end;
+end;
+
+procedure TForm1.Button10Click(Sender: TObject);
+var
+   wwidth,hheight,count: integer;
+ stock: TextFile;
+ Reply, BoxStyle: Integer;
+ rem: textfile;
+ counter,p: integer;
+ faktor: integer;
+ found: boolean;
+ whichLine,i: integer;
+ F,SL: TStringList;
+ listboxline,listboxline2: ansistring;
+ vall: integer;
+ ex2, step, f2: TextFile;
+ line,line2, ln,line3: ansistring;
+ list,list2,list3: TStringList;
+begin
+  AssignFile(step, 'steps.csv');
+            Reset(step);
+            while not eof(step) do
+            begin
+             ReadLn(step,line2);
+            end;
+            list := TStringList.Create();
+            try
+               list.CommaText := line2;
+               stepSize:=StrToint(list[0]);
+            finally
+               list.Free;
+            end;
+            CloseFile(step);
+
+            for p:=1 to stepCount do
+            begin
+             Button6.Click;
+             Sleep(75);
+            end;
+end;
+
+procedure TForm1.Button11Click(Sender: TObject);
+var
+ ex2: textfile;
+begin
+  ProgressBar1.Position := 0;
+  AssignFile(ex2,'progress.txt');
+     Rewrite(ex2);
+     Writeln(ex2, '0');
+     CloseFile(ex2);
+  KillTask('Genetic1.exe');
+  Button1.Enabled := True;
+     Button2.Enabled := true;
+     Button3.Enabled := True;
+     Button4.Enabled := True;
+     Button5.Enabled := False;
+     Button6.Enabled := False;
+     Button7.Enabled := True;
+     Button10.Enabled := False;
+     Button11.Enabled := False;
+     ComboBox1.Enabled := True;
+      Button8.Enabled := True;
+       Button9.Enabled := True;
+       Timer1.Enabled := False;
 end;
 
 procedure TForm1.Button2Click(Sender: TObject);  //Torles keszletbol
@@ -541,6 +659,7 @@ var
   line,listboxline: ansistring;
 begin
   //Torlese a keszletbol egy kivalasztott elemnek
+
   chosenItemString := ListBox1.Items[ListBox1.ItemIndex];
   found:=false;
   AssignFile(stock,'stock.csv');
@@ -865,7 +984,14 @@ begin
      CloseFile(stock);
      //beolvasas vege
   end;
-
+  If (ListBox1.Count<=0) or (ListBox2.Count<=0) then
+     begin
+        Button7.Enabled := False;
+     end
+  else
+  begin
+   Button7.Enabled := True;
+  end;
 end;
 
 procedure TForm1.Button3Click(Sender: TObject);  //Hozzadas a kivagandokhoz
@@ -875,14 +1001,25 @@ var
   stock: TextFile;
   faktor: integer;
   found: boolean;
-  whichLine,i: integer;
+  s: string;
+  whichLine,i,uu: integer;
   list,F,SL: TStringList;
   line,listboxline: ansistring;
 begin
    //Hozzadas a keszlethez!
-     wwidth := StrToInt(InputBox('Szélesség','Kérem adja meg egész számban kifejezve a SZÉLESSÉGET!',''));
-     hheight := StrToInt(InputBox('Szélesség','Kérem adja meg egész számban kifejezve a MAGASSÁGOT!',''));
-     count := StrToInt(InputBox('Szélesség','Kérem adja meg egész számban kifejezve a DARABSZÁMOT!',''));
+     repeat
+       s:=InputBox('Szélesség','Kérem adja meg egész számban kifejezve a SZÉLESSÉGET!','');
+        val(s,wwidth,uu);
+       until ((uu=0) and (wwidth>=0) and (wwidth<MaxInt)) ;
+       repeat
+       s:=InputBox('Szélesség','Kérem adja meg egész számban kifejezve a MAGASSÁGOT!','');
+        val(s,hheight,uu);
+       until ((uu=0) and (hheight>=0) and (hheight<MaxInt)) ;
+       repeat
+       s:=InputBox('Szélesség','Kérem adja meg egész számban kifejezve a DARABSZÁMOT!','');
+        val(s,count,uu);
+       until ((uu=0) and (count>=0) and (count<MaxInt)) ;
+
      AssignFile(stock,'tobecut.csv');
      Reset(stock);
      found:=false;
@@ -1210,6 +1347,14 @@ begin
      CloseFile(stock);
      //beolvasas vege
   end;
+  If (ListBox1.Count<=0) or (ListBox2.Count<=0) then
+     begin
+        Button7.Enabled := False;
+     end
+  else
+  begin
+   Button7.Enabled := True;
+  end;
 end;
 
 procedure TForm1.Button4Click(Sender: TObject);  //Torles kivagandobol
@@ -1224,6 +1369,7 @@ var
   line,listboxline: ansistring;
 begin
   //Torlese a kivagandobol egy kivalasztott elemnek
+
   chosenItemString := ListBox2.Items[ListBox2.ItemIndex];
   found:=false;
   AssignFile(stock,'tobecut.csv');
@@ -1548,6 +1694,14 @@ begin
      CloseFile(stock);
      //beolvasas vege
   end;
+  If (ListBox1.Count<=0) or (ListBox2.Count<=0) then
+     begin
+        Button7.Enabled := False;
+     end
+  else
+  begin
+   Button7.Enabled := True;
+  end;
 end;
 
 procedure TForm1.Button5Click(Sender: TObject);  //Kovetkezo lepes
@@ -1769,8 +1923,11 @@ var
   ex,ex2,f,stock: TextFile;
   line,listboxline: ansistring;
   areaToBeCut: integer;
+  maxwidth: integer;
+  maxheight: integer;
   list: TStringList;
   selected: Rectangle;
+  faktor: integer;
   areaStock: integer;
   def: rectangle;
   s: string;
@@ -1779,7 +1936,22 @@ begin
      //copypasta
      //ListBox1.Clear;
      //ListBox2.Clear;
-
+      if combobox1.Items[combobox1.ItemIndex]='mm' then
+                       begin
+                            faktor := 1;
+                       end;
+                       if combobox1.Items[combobox1.ItemIndex]='cm' then
+                       begin
+                            faktor := 10;
+                       end;
+                       if combobox1.Items[combobox1.ItemIndex]='dm' then
+                       begin
+                            faktor := 100;
+                       end;
+                       if combobox1.Items[combobox1.ItemIndex]='m' then
+                       begin
+                            faktor := 1000;
+                       end;
      //DrawFPVectorialToCanvas('teszt.svg',Image1.Canvas);
      Button5.Enabled:=False;
      Button6.Enabled:=False;
@@ -1870,6 +2042,21 @@ begin
      def.width:=0;
      def.height:=0;
      selected:=def;
+
+     maxwidth:=0;
+     maxheight:=0;
+     for j:=0 to length(sortstock)-1 do
+         begin
+          if sortstock[j].width > maxwidth then
+          begin
+          maxwidth := sortstock[j].width;
+          end;
+          if sortstock[j].height > maxheight then
+          begin
+          maxheight := sortstock[j].height;
+          end;
+         end;
+
      for j:=0 to length(sortstock)-1 do
          begin
               if j=length(sortstock)-1 then
@@ -1878,14 +2065,14 @@ begin
               end;
               areaStock:=(sortstock[j].width*sortstock[j].height);
               //ShowMessage(IntToStr(areastock)+' >= '+IntToStr(areatobecut));
-              if (sortstock[j].alreadyWas=false) and ( areaStock>areatobecut ) then
+              if (sortstock[j].alreadyWas=false) and ( areaStock>areatobecut ) and (sortstock[j].width > maxwidth) and (sortstock[j].height > maxheight) then
               begin
                    sortstock[j].alreadyWas:=True;
                    selected:=sortstock[j];
                    chosenitemstring:=inttostr(selected.width) + ', '+inttostr(selected.height);
                    Label3.Visible := True;
                    Label4.Visible := True;
-                   Label4.Caption := inttostr(selected.width)+', '+inttostr(selected.height);
+                   Label4.Caption := floattostr(selected.width / faktor)+', '+floattostr(selected.height / faktor);
                    Break;
               end;
          end;
@@ -1905,20 +2092,24 @@ begin
        repeat
        s:=(inputbox('Vágási szélesség', 'Mi legyen a vágási szélesség (mm-ben értendő)? Kérem egész számot adjon meg!', '1'));
         val(s,cutWidth,uu);
-       until ((uu=0) and (cutWidth>=0) and (cutWidth>MaxInt)) ;
+       until ((uu=0) and (cutWidth>=0) and (cutWidth<MaxInt)) ;
      end;
      AssignFile(ex, 'exchange.txt');
      Rewrite(ex);
      WriteLn(ex,IntToStr(selected.width));
      WriteLn(ex,IntToStr(selected.height));
      WriteLn(ex,IntToStr(cutWidth));
-     WriteLn(ex,Edit1.Text);
-     WriteLn(ex,Edit2.Text);
+     WriteLn(ex,inttostr(populacio));
+     WriteLn(ex,inttostr(generacio));
      CloseFile(ex);
+     AssignFile(ex2, 'progress.txt');
+     Rewrite(ex2);
+     WriteLn(ex2, '0');
+     CloseFile(ex2);
      ShellExecute(0, 'open', ('Genetic1.exe'), nil, nil, SW_HIDE);
      Sleep(250);
      ProgressBar1.Min:=0;
-     ProgressBar1.Max:=StrToInt(Edit2.text);
+     ProgressBar1.Max:=StrToInt(inttostr(generacio));
      AssignFile(ex2,'progress.txt');
      Reset(ex2);
      Readln(ex2, line);
@@ -1936,8 +2127,25 @@ var
   line,listboxline: ansistring;
   list: TStringList;
   f: textfile;
-
+     faktor:integer;
 begin
+
+     if combobox1.Items[combobox1.ItemIndex]='mm' then
+                       begin
+                            faktor := 1;
+                       end;
+                       if combobox1.Items[combobox1.ItemIndex]='cm' then
+                       begin
+                            faktor := 10;
+                       end;
+                       if combobox1.Items[combobox1.ItemIndex]='dm' then
+                       begin
+                            faktor := 100;
+                       end;
+                       if combobox1.Items[combobox1.ItemIndex]='m' then
+                       begin
+                            faktor := 1000;
+                       end;
      ListBox1.Clear;
      ListBox2.Clear;
      AssignFile(f, 'stock.csv');
@@ -1958,8 +2166,8 @@ begin
       ReadLn(stock,line);
       try
          list.CommaText := line;
-         listboxline:=listboxline+list[0]+', ';
-         listboxline:=listboxline+list[1];
+         listboxline:=listboxline+FloatToStr(StrTOInt(list[0])/faktor)+', ';
+         listboxline:=listboxline+FloatToStr(StrTOInt(list[1])/faktor);
          for i:=1 to StrToInt(list[2]) do
          begin
              counter:=counter+1;
@@ -1988,8 +2196,8 @@ begin
       ReadLn(stock,line);
       try
          list.CommaText := line;
-         listboxline:=listboxline+list[0]+', ';
-         listboxline:=listboxline+list[1];
+         listboxline:=listboxline+FloatToStr(StrTOInt(list[0])/faktor)+', ';
+         listboxline:=listboxline+FloatToStr(StrTOInt(list[1])/faktor);
          for i:=1 to StrToInt(list[2]) do
          begin
               counter:=counter+1;
@@ -2005,6 +2213,14 @@ begin
      end;
      CloseFile(stock);
      //beolvasas vege
+      If (ListBox1.Count<=0) or (ListBox2.Count<=0) then
+     begin
+        Button7.Enabled := False;
+     end
+  else
+  begin
+   Button7.Enabled := True;
+  end;
 end;
 
 procedure TForm1.Button9Click(Sender: TObject);    //kivagandokbol minden torlese
@@ -2014,8 +2230,25 @@ var
   line,listboxline: ansistring;
   list: TStringList;
   f: textfile;
-
+         faktor:integer;
 begin
+
+     if combobox1.Items[combobox1.ItemIndex]='mm' then
+                       begin
+                            faktor := 1;
+                       end;
+                       if combobox1.Items[combobox1.ItemIndex]='cm' then
+                       begin
+                            faktor := 10;
+                       end;
+                       if combobox1.Items[combobox1.ItemIndex]='dm' then
+                       begin
+                            faktor := 100;
+                       end;
+                       if combobox1.Items[combobox1.ItemIndex]='m' then
+                       begin
+                            faktor := 1000;
+                       end;
      AssignFile(f, 'tobecut.csv');
      Rewrite(f);
      CloseFile(f);
@@ -2033,8 +2266,8 @@ begin
       ReadLn(stock,line);
       try
          list.CommaText := line;
-         listboxline:=listboxline+list[0]+', ';
-         listboxline:=listboxline+list[1];
+         listboxline:=listboxline+FloatToStr(StrTOInt(list[0])/faktor)+', ';
+         listboxline:=listboxline+FloatToStr(StrTOInt(list[1])/faktor);
          for i:=1 to StrToInt(list[2]) do
          begin
              counter:=counter+1;
@@ -2063,8 +2296,8 @@ begin
       ReadLn(stock,line);
       try
          list.CommaText := line;
-         listboxline:=listboxline+list[0]+', ';
-         listboxline:=listboxline+list[1];
+         listboxline:=listboxline+FloatToStr(StrTOInt(list[0])/faktor)+', ';
+         listboxline:=listboxline+FloatToStr(StrTOInt(list[1])/faktor);
          for i:=1 to StrToInt(list[2]) do
          begin
               counter:=counter+1;
@@ -2080,6 +2313,14 @@ begin
      end;
      CloseFile(stock);
      //beolvasas vege
+      If (ListBox1.Count<=0) or (ListBox2.Count<=0) then
+     begin
+        Button7.Enabled := False;
+     end
+  else
+  begin
+   Button7.Enabled := True;
+  end;
 end;
 
 procedure TForm1.ComboBox1Change(Sender: TObject);
@@ -2433,15 +2674,40 @@ var
   f: textfile;
   sstock: array of rectangle;
   ttobecut: array of rectangle;
+  faktor:integer;
 
 begin
+  If (ListBox1.Count<=0) or (ListBox2.Count<=0) then
+     begin
+        Button7.Enabled := False;
+     end
+  else
+  begin
+   Button7.Enabled := True;
+  end;
+  if combobox1.Items[combobox1.ItemIndex]='mm' then
+                       begin
+                            faktor := 1;
+                       end;
+                       if combobox1.Items[combobox1.ItemIndex]='cm' then
+                       begin
+                            faktor := 10;
+                       end;
+                       if combobox1.Items[combobox1.ItemIndex]='dm' then
+                       begin
+                            faktor := 100;
+                       end;
+                       if combobox1.Items[combobox1.ItemIndex]='m' then
+                       begin
+                            faktor := 1000;
+                       end;
   If (ListBox1.SelCount > 0) or (ListBox2.SelCount>0) then
   begin
 
   end
   else
   begin
-  Timer2.Interval := 1000;
+  Timer2.Interval := (ListBox1.Count+ListBox2.Count)*100+5;
      ListBox1.Clear;
      ListBox2.Clear;
      //DrawFPVectorialToCanvas('teszt.svg',Image1.Canvas);
@@ -2473,7 +2739,7 @@ begin
      bubblesort(sstock, counter);
      for p:=1 to counter do
      begin
-          ListBox1.Items.Add(IntToStr(sstock[p-1].width) + ', ' + IntToStr(sstock[p-1].height));
+          ListBox1.Items.Add(FloatToStr(sstock[p-1].width / faktor) + ', ' + FloatToStr(sstock[p-1].height / faktor));
      end;
      counter:=0;
 
@@ -2505,11 +2771,41 @@ begin
      bubblesort(ttobecut, counter);
      for p:=1 to counter do
      begin
-          ListBox2.Items.Add(IntToStr(ttobecut[p-1].width) + ', ' + IntToStr(ttobecut[p-1].height));
+          ListBox2.Items.Add(FloatToSTR(ttobecut[p-1].width / faktor) + ', ' + FloatToStr(ttobecut[p-1].height / faktor));
      end;
      //beolvasas vege
 end;
 
+end;
+
+procedure TForm1.TrackBar1Change(Sender: TObject);
+begin
+
+end;
+
+procedure TForm1.TrackBar1MouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+begin
+  If TrackBar1.Position=1 then
+  begin
+       populacio := 30;
+       generacio := 5;
+  end;
+   If TrackBar1.Position=2 then
+  begin
+      populacio := 30;
+       generacio := 10;
+  end;
+    If TrackBar1.Position=3 then
+  begin
+     populacio := 30;
+       generacio := 25;
+  end;
+     If TrackBar1.Position=4 then
+  begin
+     populacio := 30;
+       generacio := 60;
+  end;
 end;
 
 procedure TForm1.Timer1Timer(Sender: TObject);   //Timer a ProgressBarhoz
@@ -2529,19 +2825,25 @@ var
   line,line2, ln,line3: ansistring;
   list,list2,list3: TStringList;
 begin
+
+     Button10.Enabled := False;
+     ComboBox1.Enabled := False;
      Button1.Enabled := False;
      Button2.Enabled := False;
+     Button11.Enabled := True;
      Button3.Enabled := False;
      Button4.Enabled := False;
      Button5.Enabled := False;
      Button6.Enabled := False;
      Button7.Enabled := False;
+      Button8.Enabled := False;
+       Button9.Enabled := False;
      AssignFile(ex2,'progress.txt');
      Reset(ex2);
      Readln(ex2, line);
      ProgressBar1.Position:=StrToInt(line);
      CloseFile(ex2);
-     if (StrToInt(line)<(StrToInt(Edit2.text)-1)) and (StrToint(line)<>9999999) and (strtoint(line)<>-1) then
+     if (StrToInt(line)<(generacio-1)) and (StrToint(line)<>9999999) and (strtoint(line)<>-1) then
      begin
            Reset(ex2);
            Readln(ex2, line);
@@ -2554,9 +2856,14 @@ begin
      Button2.Enabled := true;
      Button3.Enabled := True;
      Button4.Enabled := True;
+      Button11.Enabled := False;
      Button5.Enabled := True;
      Button6.Enabled := True;
      Button7.Enabled := True;
+     Button10.Enabled := True;
+     ComboBox1.Enabled := True;
+      Button8.Enabled := True;
+       Button9.Enabled := True;
        Timer1.Enabled := False;
        sleep(1000);
        AssignFile(f2, 'steps.csv');
@@ -2579,17 +2886,19 @@ begin
        if (StrToInt(line)=9999999) then
        begin
             //ShowMessage('Talaltunk megoldast!');
-            while not Sysutils.FileExists('temp'+IntToStr(vall-1)+'.svg') do
+            while (not Sysutils.FileExists('temp'+IntToStr(vall-2)+'.svg')) and (not Sysutils.FileExists('temp'+IntToStr(vall-1)+'.svg')) do
              begin
+
                   sleep(50);
              end;
+            Sleep(2500);
             KillTask('Genetic1.exe');
              AssignFile(f2, 'progress.txt');
              Rewrite(f2);
              Writeln(f2, '0');
              CloseFile(f2);
             notFirst:=false;
-            ProgressBar1.Position:=StrToInt(Edit2.text);
+            ProgressBar1.Position:=generacio;
             Button5.Enabled:=True;
 
             Button6.Enabled:=False;
@@ -3294,6 +3603,14 @@ begin
 
              end;
 
+             If (ListBox1.Count<=0) or (ListBox2.Count<=0) then
+     begin
+        Button7.Enabled := False;
+     end
+  else
+  begin
+   Button7.Enabled := True;
+  end;
             if stepSize=1 then
              begin
                Button5.Enabled := False;
@@ -3310,7 +3627,6 @@ begin
 
             if theend=false then
             begin
-            showmessage('folytatódik');
             notFirst:=true;
             Button7.Click;
 
@@ -3323,13 +3639,14 @@ begin
             stepSize:=0;
             stepCount := 0;
        end;
-       if  (StrToInt(line)=(StrToInt(Edit2.text)-1)) then
+       if  (StrToInt(line)=(generacio-1)) then
        begin
             //ShowMessage('Találtunk megoldást!');
-             while not Sysutils.FileExists('temp'+IntToStr(vall-1)+'.svg') do
+             while (not Sysutils.FileExists('temp'+IntToStr(vall-2)+'.svg')) and (not Sysutils.FileExists('temp'+IntToStr(vall-1)+'.svg')) do
              begin
                   sleep(50);
              end;
+             Sleep(2500);
              KillTask('Genetic1.exe');
             AssignFile(f2, 'progress.txt');
              Rewrite(f2);
@@ -3337,7 +3654,7 @@ begin
              CloseFile(f2);
 
             notFirst:=false;
-            ProgressBar1.Position:=StrToInt(Edit2.text);
+            ProgressBar1.Position:=generacio;
             Button5.Enabled:=True;
             Button6.Enabled:=False;
             AssignFile(step, 'steps.csv');
@@ -4044,6 +4361,14 @@ begin
   end;
 
              end;
+       If (ListBox1.Count<=0) or (ListBox2.Count<=0) then
+     begin
+        Button7.Enabled := False;
+     end
+  else
+  begin
+   Button7.Enabled := True;
+  end;
        end;
      end;
 end;
