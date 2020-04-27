@@ -2089,10 +2089,6 @@ begin
      end
      else
      begin
-
-     stepCount := 0;
-     Button5.Enabled:=False;
-     Button6.Enabled:=False;
      if notFirst=false then
      begin
        repeat
@@ -2100,6 +2096,10 @@ begin
         val(s,cutWidth,uu);
        until ((uu=0) and (cutWidth>=0) and (cutWidth<MaxInt)) ;
      end;
+     stepCount := 0;
+     Button5.Enabled:=False;
+     Button6.Enabled:=False;
+
      AssignFile(ex, 'exchange.txt');
      Rewrite(ex);
      WriteLn(ex,IntToStr(selected.width));

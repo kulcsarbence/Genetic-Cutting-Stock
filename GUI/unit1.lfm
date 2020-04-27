@@ -312,7 +312,7 @@ object Form1: TForm1
     Left = 718
     Height = 23
     Top = 496
-    Width = 186
+    Width = 138
     OnChange = Edit1Change
     OnExit = Edit1Exit
     OnMouseLeave = Edit1MouseLeave
@@ -326,6 +326,17 @@ object Form1: TForm1
     Width = 184
     Caption = 'Ennél vékonyabb elemek kidobása:'
     ParentColor = False
+  end
+  object Label11: TLabel
+    Left = 866
+    Height = 25
+    Top = 494
+    Width = 34
+    Caption = 'mm'
+    Font.Height = -19
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
   end
   object Timer1: TTimer
     Enabled = False
