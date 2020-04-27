@@ -3657,6 +3657,8 @@ begin
        if (StrToint(line)=-1) then
        begin
             ShowMessage('Nem találtunk megoldást!');
+            Button5.Enabled := False;
+            Button6.Enabled := False;
             AssignFile(f2, 'progress.txt');
              Rewrite(f2);
              Writeln(f2, '0');
