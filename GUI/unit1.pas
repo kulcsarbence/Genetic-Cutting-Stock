@@ -2072,7 +2072,7 @@ begin
               end;
               areaStock:=(sortstock[j].width*sortstock[j].height);
               //ShowMessage(IntToStr(areastock)+' >= '+IntToStr(areatobecut));
-              if (sortstock[j].alreadyWas=false) and ( areaStock>areatobecut ) and (sortstock[j].width > maxwidth) and (sortstock[j].height > maxheight) then
+              if (sortstock[j].alreadyWas=false) and ( areaStock>areatobecut ) and ((sortstock[j].width > maxwidth) or (sortstock[j].height > maxheight)) then
               begin
                    sortstock[j].alreadyWas:=True;
                    selected:=sortstock[j];
