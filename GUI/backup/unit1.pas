@@ -29,9 +29,11 @@ type
     Button8: TButton;
     Button9: TButton;
     ComboBox1: TComboBox;
+    Edit1: TEdit;
 
     Image1: TImage;
     Label1: TLabel;
+    Label10: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -66,6 +68,9 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure ComboBox1MouseLeave(Sender: TObject);
     procedure ComboBox1Select(Sender: TObject);
+    procedure Edit1Change(Sender: TObject);
+    procedure Edit1Exit(Sender: TObject);
+    procedure Edit1MouseLeave(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
@@ -74,6 +79,7 @@ type
     Procedure BubbleSort(var numbers : Array of Rectangle; size : Integer);
     function KillTask(ExeFileName: string): Integer;
     procedure Timer2Timer(Sender: TObject);
+    procedure Timer3Timer(Sender: TObject);
     procedure TrackBar1Change(Sender: TObject);
     procedure TrackBar1MouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
@@ -2045,15 +2051,15 @@ begin
 
      maxwidth:=0;
      maxheight:=0;
-     for j:=0 to length(sortstock)-1 do
+     for j:=0 to length(_tobecut)-1 do
          begin
-          if sortstock[j].width > maxwidth then
+          if _tobecut[j].width > maxwidth then
           begin
-          maxwidth := sortstock[j].width;
+          maxwidth := _tobecut[j].width;
           end;
-          if sortstock[j].height > maxheight then
+          if _tobecut[j].height > maxheight then
           begin
-          maxheight := sortstock[j].height;
+          maxheight := _tobecut[j].height;
           end;
          end;
 
@@ -2616,7 +2622,29 @@ begin
   end;
 end;
 
+procedure TForm1.Edit1Change(Sender: TObject);
+begin
 
+end;
+
+procedure TForm1.Edit1Exit(Sender: TObject);
+    var
+           s: string;
+           vel: integer;
+           uu: integer;
+  begin
+       s := Edit1.Text;
+       val(s,vel,uu);
+     if not ((uu=0) and (vel>=0) and (vel<MaxInt)) then
+     begin
+       Edit1.Text := '5';
+       end;
+  end;
+
+procedure TForm1.Edit1MouseLeave(Sender: TObject);
+begin
+
+end;
 
 
 
@@ -2775,6 +2803,11 @@ begin
      end;
      //beolvasas vege
 end;
+
+end;
+
+procedure TForm1.Timer3Timer(Sender: TObject);
+begin
 
 end;
 
@@ -2989,9 +3022,13 @@ begin
          list.Free;
       end;
      end;
-     if not found then
+     if (not found) then
      begin
-                CloseFile(stock);
+       CloseFile(stock);
+     end;
+     if (not found) and (wwidth>=StrToint(edit1.text)) and (hheight>=StrToint(edit1.text)) then
+     begin
+
                 Append(stock);
                 WriteLn(stock,IntToStr(wwidth*faktor)+','+IntToStr(hheight*faktor)+','+IntToStr(count)+',');
                 CloseFile(stock);
@@ -3748,9 +3785,13 @@ begin
          list.Free;
       end;
      end;
-     if not found then
+     if (not found) then
      begin
-                CloseFile(stock);
+       CloseFile(stock);
+     end;
+     if (not found) and (wwidth>=StrToint(edit1.text)) and (hheight>=StrToint(edit1.text)) then
+     begin
+
                 Append(stock);
                 WriteLn(stock,IntToStr(wwidth*faktor)+','+IntToStr(hheight*faktor)+','+IntToStr(count)+',');
                 CloseFile(stock);

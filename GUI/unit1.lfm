@@ -3,6 +3,8 @@ object Form1: TForm1
   Height = 527
   Top = 122
   Width = 912
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
   Caption = 'Lapszabászati program v0.3'
   ClientHeight = 527
   ClientWidth = 912
@@ -172,7 +174,7 @@ object Form1: TForm1
     Left = 8
     Height = 40
     Top = 480
-    Width = 895
+    Width = 704
     ParentFont = False
     TabOrder = 11
   end
@@ -305,6 +307,25 @@ object Form1: TForm1
     Font.Height = -17
     ParentColor = False
     ParentFont = False
+  end
+  object Edit1: TEdit
+    Left = 718
+    Height = 23
+    Top = 496
+    Width = 186
+    OnChange = Edit1Change
+    OnExit = Edit1Exit
+    OnMouseLeave = Edit1MouseLeave
+    TabOrder = 17
+    Text = '5'
+  end
+  object Label10: TLabel
+    Left = 718
+    Height = 15
+    Top = 480
+    Width = 184
+    Caption = 'Ennél vékonyabb elemek kidobása:'
+    ParentColor = False
   end
   object Timer1: TTimer
     Enabled = False
