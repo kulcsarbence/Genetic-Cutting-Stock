@@ -12,6 +12,8 @@
       <UseXPManifest Value="True"/>
       <XPManifest>
         <DpiAware Value="True"/>
+        <TextName Value="Lapszabászati program"/>
+        <TextDesc Value="Lapszabászati program kétdimenziós problémákra"/>
       </XPManifest>
       <Icon Value="0"/>
     </General>
@@ -62,7 +64,7 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="project1"/>
+      <Filename Value="Lapszabaszat"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>

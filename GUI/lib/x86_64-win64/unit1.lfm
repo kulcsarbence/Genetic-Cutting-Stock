@@ -2,16 +2,22 @@ object Form1: TForm1
   Left = 242
   Height = 527
   Top = 122
-  Width = 912
+  Width = 907
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Lapszabászati program v0.3'
   ClientHeight = 527
-  ClientWidth = 912
-  Color = clGradientActiveCaption
+  ClientWidth = 907
+  Color = 5855660
   OnClose = FormClose
   OnCreate = FormCreate
   LCLVersion = '2.0.6.0'
+  object Image2: TImage
+    Left = 0
+    Height = 527
+    Top = 0
+    Width = 912
+  end
   object Label1: TLabel
     Left = 26
     Height = 32

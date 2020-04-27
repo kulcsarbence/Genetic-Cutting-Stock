@@ -12,6 +12,9 @@ uses
 		width,height: integer;
                 alreadyWas:boolean;
 	end;
+        type
+  pRGBQuadArray = ^TRGBQuadArray;
+  TRGBQuadArray = ARRAY [0 .. 0] OF TRGBQuad;
 type
 
   { TForm1 }
@@ -32,6 +35,7 @@ type
     Edit1: TEdit;
 
     Image1: TImage;
+    Image2: TImage;
     Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
@@ -125,8 +129,9 @@ var
   line,listboxline: ansistring;
   list: TStringList;
   f: textfile;
-
 begin
+  image2.Picture.LoadFromFile( 'parquet.png');
+  image2.Stretch := True ;
   If TrackBar1.Position=1 then
   begin
        populacio := 30;
@@ -666,7 +671,12 @@ var
   line,listboxline: ansistring;
 begin
   //Torlese a keszletbol egy kivalasztott elemnek
+  if listbox1.itemindex=-1 then
+  begin
 
+  end
+  else
+  begin
   chosenItemString := ListBox1.Items[ListBox1.ItemIndex];
   found:=false;
   AssignFile(stock,'stock.csv');
@@ -998,6 +1008,8 @@ begin
   else
   begin
    Button7.Enabled := True;
+  end;
+
   end;
 end;
 
@@ -1376,7 +1388,12 @@ var
   line,listboxline: ansistring;
 begin
   //Torlese a kivagandobol egy kivalasztott elemnek
+  if listbox2.itemindex=-1 then
+  begin
 
+  end
+  else
+  begin
   chosenItemString := ListBox2.Items[ListBox2.ItemIndex];
   found:=false;
   AssignFile(stock,'tobecut.csv');
@@ -1708,6 +1725,8 @@ begin
   else
   begin
    Button7.Enabled := True;
+  end;
+
   end;
 end;
 
@@ -2959,6 +2978,7 @@ begin
   Reply := Application.MessageBox('Elmentsuk a jelenlegi allapotot, azaz a megmaradt elemek bekeruljenek a stockba?','Mentes' , BoxStyle);
   if Reply = IDYES then
              begin
+               theend:=false;
                   ShowMessage(chosenitemstring);
                   AssignFile(rem, 'tobecut.csv');
                   Rewrite(rem);
@@ -3725,6 +3745,7 @@ begin
   Reply := Application.MessageBox('Elmentsuk a jelenlegi allapotot, azaz a megmaradt elemek bekeruljenek a stockba?','Mentes' , BoxStyle);
   if Reply = IDYES then
              begin
+               theend:=false;
                  AssignFile(rem, 'tobecut.csv');
                   Rewrite(rem);
                   CloseFile(rem);

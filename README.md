@@ -9,7 +9,7 @@ This program was written for the "Projektmunka 1" course at Széchenyi István U
 The current version is `0.3` beta. **I don't recommend using the algorithm for any essential work yet.**
 If you want to check out the current version, I recommend you following these steps:
 - Download the **GUI folder** of this repository.
-- Start the `Project1.exe` file.
+- Start the `Lapszabaszat.exe` file.
 - Use the `Hozzáadás` button to add new planks to the list of items in stock (*Készlet*) or to the list of items to be cut (*Kivágandó*). 
 - Use the `Töröl` button to delete items from these lists.
 - Use the `Megoldás keresése` button to find a solution for the given problem. 
