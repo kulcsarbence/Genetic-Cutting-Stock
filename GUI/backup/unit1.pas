@@ -664,6 +664,7 @@ procedure TForm1.Button2Click(Sender: TObject);  //Torles keszletbol
 var
 
   stock: TextFile;
+  faktor:integer;
   counter: integer;
   found: boolean;
   whichLine,i: integer;
@@ -680,8 +681,13 @@ begin
   chosenItemString := ListBox1.Items[ListBox1.ItemIndex];
   found:=false;
   AssignFile(stock,'stock.csv');
-  Reset(stock);
+  //Reset(stock);
   whichLine := -1;
+  faktor := 1;
+  while not found do
+  begin
+     Reset(stock);
+     whichLine := -1;
      while not Eof(stock) and not found do
      begin
       listboxline:='';
@@ -690,17 +696,21 @@ begin
       whichLine := whichLine + 1;
       try
          list.CommaText := line;
-         listboxline:=listboxline+list[0]+', ';
-         listboxline:=listboxline+list[1];
+         listboxline:=listboxline+FloatToStr( StrToInt(list[0])/faktor)+', ';
+         listboxline:=listboxline+FloatToStr( StrToInt(list[1])/faktor);
+
          if listboxline=chosenItemString then
          begin
+              found:=true;
               if StrToInt(list[2])>1 then
               begin
                    F:=TStringList.Create;
                     try
                        CloseFile(stock);
                        F.LoadFromFile('stock.csv');
+
                        F.Strings[whichLine]:=list[0]+','+list[1]+','+IntToStr( StrToInt(list[2])-1 )+',';
+
                        F.SaveToFile('stock.csv');
                     finally
                        F.Free;
@@ -709,7 +719,7 @@ begin
               end
               else
               begin
-                   SL := TStringList.Create();
+                   SL := TStringList.Create;
                    try
                       CloseFile(stock);
                        SL.LoadFromFile('stock.csv');
@@ -727,6 +737,11 @@ begin
          list.Free;
       end;
      end;
+     faktor := faktor*10;
+     if not found then
+        closefile(stock);
+     end;
+
      //beolvasasa a kivagando elemeknek es a keszlet elemeknek
      {*AssignFile(stock,'stock.csv');
      Reset(stock);
@@ -1394,11 +1409,16 @@ begin
   end
   else
   begin
-  chosenItemString := ListBox2.Items[ListBox2.ItemIndex];
+  chosenItemString := ListBox1.Items[ListBox1.ItemIndex];
   found:=false;
   AssignFile(stock,'tobecut.csv');
-  Reset(stock);
+  //Reset(stock);
   whichLine := -1;
+  faktor := 1;
+  while not found do
+  begin
+     Reset(stock);
+     whichLine := -1;
      while not Eof(stock) and not found do
      begin
       listboxline:='';
@@ -1407,17 +1427,21 @@ begin
       whichLine := whichLine + 1;
       try
          list.CommaText := line;
-         listboxline:=listboxline+list[0]+', ';
-         listboxline:=listboxline+list[1];
+         listboxline:=listboxline+FloatToStr( StrToInt(list[0])/faktor)+', ';
+         listboxline:=listboxline+FloatToStr( StrToInt(list[1])/faktor);
+
          if listboxline=chosenItemString then
          begin
+              found:=true;
               if StrToInt(list[2])>1 then
               begin
                    F:=TStringList.Create;
                     try
                        CloseFile(stock);
                        F.LoadFromFile('tobecut.csv');
+
                        F.Strings[whichLine]:=list[0]+','+list[1]+','+IntToStr( StrToInt(list[2])-1 )+',';
+
                        F.SaveToFile('tobecut.csv');
                     finally
                        F.Free;
@@ -1426,7 +1450,7 @@ begin
               end
               else
               begin
-                   SL := TStringList.Create();
+                   SL := TStringList.Create;
                    try
                       CloseFile(stock);
                        SL.LoadFromFile('tobecut.csv');
@@ -1443,6 +1467,10 @@ begin
       finally
          list.Free;
       end;
+     end;
+     faktor := faktor*10;
+     if not found then
+        closefile(stock);
      end;
      //beolvasasa a kivagando elemeknek es a keszlet elemeknek
     {* AssignFile(stock,'tobecut.csv');
@@ -2978,6 +3006,7 @@ begin
   Reply := Application.MessageBox('Elmentsuk a jelenlegi allapotot, azaz a megmaradt elemek bekeruljenek a stockba?','Mentes' , BoxStyle);
   if Reply = IDYES then
              begin
+               theend:=false;
                   ShowMessage(chosenitemstring);
                   AssignFile(rem, 'tobecut.csv');
                   Rewrite(rem);
@@ -3686,7 +3715,6 @@ begin
 
             if theend=false then
             begin
-              showmessage('yeah');
             notFirst:=true;
             Button7.Click;
 
@@ -3745,6 +3773,7 @@ begin
   Reply := Application.MessageBox('Elmentsuk a jelenlegi allapotot, azaz a megmaradt elemek bekeruljenek a stockba?','Mentes' , BoxStyle);
   if Reply = IDYES then
              begin
+               theend:=false;
                  AssignFile(rem, 'tobecut.csv');
                   Rewrite(rem);
                   CloseFile(rem);
