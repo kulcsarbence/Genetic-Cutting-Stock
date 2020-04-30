@@ -78,6 +78,7 @@ type
     procedure Edit1MouseLeave(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
+    procedure Image2Click(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
@@ -128,8 +129,23 @@ var
   i, counter: Integer;
   line,listboxline: ansistring;
   list: TStringList;
-  f: textfile;
+  vonal: ansistring;
+  f,g: textfile;
 begin
+  assignfile(g, 'drop.txt');
+  reset(g);
+  readln(g, vonal);
+  closefile(g);
+  if vonal='' then
+   begin
+   Edit1.Text := '5';
+   end
+  else
+  begin
+  Edit1.Text := vonal;
+
+  end;
+
   image2.Picture.LoadFromFile( 'parquet.png');
   image2.Stretch := True ;
   If TrackBar1.Position=1 then
@@ -232,6 +248,11 @@ begin
      Memo1.Clear;
 end;
 
+procedure TForm1.Image2Click(Sender: TObject);
+begin
+
+end;
+
 procedure TForm1.Button1Click(Sender: TObject); //Hozzaadas keszlethez
 var
   wwidth,hheight,count: integer;
@@ -239,26 +260,39 @@ var
   counter: integer;
   faktor: integer;
   found: boolean;
+  exx: boolean;
   s:string;
   whichLine,i,uu: integer;
   list,F,SL: TStringList;
   line,listboxline: ansistring;
 begin
-
+   exx := false;
    //Hozzadas a keszlethez!
      repeat
        s:=InputBox('Szélesség','Kérem adja meg egész számban kifejezve a SZÉLESSÉGET!','');
         val(s,wwidth,uu);
-       until ((uu=0) and (wwidth>=0) and (wwidth<MaxInt)) ;
+        if s='' then exx:=true;
+       until ((uu=0) and (wwidth>=0) and (wwidth<MaxInt)) or exx ;
+       if not exx then
+       begin
        repeat
        s:=InputBox('Szélesség','Kérem adja meg egész számban kifejezve a MAGASSÁGOT!','');
         val(s,hheight,uu);
-       until ((uu=0) and (hheight>=0) and (hheight<MaxInt)) ;
+        if s='' then exx:=true;
+       until ((uu=0) and (hheight>=0) and (hheight<MaxInt)) or exx ;
+
+       end;
+       if not exx then
+       begin
        repeat
        s:=InputBox('Szélesség','Kérem adja meg egész számban kifejezve a DARABSZÁMOT!','');
         val(s,count,uu);
-       until ((uu=0) and (count>=0) and (count<MaxInt)) ;
+        if s='' then exx:=true;
+       until ((uu=0) and (count>=0) and (count<MaxInt)) or exx ;
 
+       end;
+    if not exx then
+    begin
      AssignFile(stock,'stock.csv');
      Reset(stock);
      found:=false;
@@ -397,6 +431,7 @@ begin
      CloseFile(stock);
      //beolvasas vege
   end;
+
   If ComboBox1.Items[ComboBox1.ItemIndex]='cm' then
   begin
        AssignFile(stock,'stock.csv');
@@ -593,6 +628,7 @@ begin
     else
     begin
      Button7.Enabled := True;
+    end;
     end;
 end;
 
@@ -1035,25 +1071,39 @@ var
   stock: TextFile;
   faktor: integer;
   found: boolean;
+  exx: boolean;
   s: string;
   whichLine,i,uu: integer;
   list,F,SL: TStringList;
   line,listboxline: ansistring;
 begin
+  exx:=false;
    //Hozzadas a keszlethez!
      repeat
        s:=InputBox('Szélesség','Kérem adja meg egész számban kifejezve a SZÉLESSÉGET!','');
         val(s,wwidth,uu);
-       until ((uu=0) and (wwidth>=0) and (wwidth<MaxInt)) ;
+        if s='' then exx := true;
+       until ((uu=0) and (wwidth>=0) and (wwidth<MaxInt)) or exx ;
+       if not exx then
+          begin
        repeat
        s:=InputBox('Szélesség','Kérem adja meg egész számban kifejezve a MAGASSÁGOT!','');
         val(s,hheight,uu);
-       until ((uu=0) and (hheight>=0) and (hheight<MaxInt)) ;
+        if s='' then exx := true;
+       until ((uu=0) and (hheight>=0) and (hheight<MaxInt)) or exx ;
+
+          end;
+       if not exx then
+          begin
        repeat
        s:=InputBox('Szélesség','Kérem adja meg egész számban kifejezve a DARABSZÁMOT!','');
         val(s,count,uu);
-       until ((uu=0) and (count>=0) and (count<MaxInt)) ;
+        if s='' then exx:=true;
+       until ((uu=0) and (count>=0) and (count<MaxInt)) or exx ;
 
+          end;
+     if not exx then
+        begin
      AssignFile(stock,'tobecut.csv');
      Reset(stock);
      found:=false;
@@ -1389,6 +1439,8 @@ begin
   begin
    Button7.Enabled := True;
   end;
+
+        end;
 end;
 
 procedure TForm1.Button4Click(Sender: TObject);  //Torles kivagandobol
@@ -1764,6 +1816,7 @@ var
   svg: TBGRASVG;
   stock: TextFile;
   faktor: integer;
+  kiir: ansistring;
   i: Integer;
   line,listboxline, viz: ansistring;
   list: TStringList;
@@ -1771,18 +1824,22 @@ begin
        if combobox1.Items[combobox1.ItemIndex]='mm' then
                        begin
                             faktor := 1;
+                            kiir := 'mm';
                        end;
                        if combobox1.Items[combobox1.ItemIndex]='cm' then
                        begin
                             faktor := 10;
+                            kiir := 'cm';
                        end;
                        if combobox1.Items[combobox1.ItemIndex]='dm' then
                        begin
                             faktor := 100;
+                            kiir := 'dm';
                        end;
                        if combobox1.Items[combobox1.ItemIndex]='m' then
                        begin
                             faktor := 1000;
+                            kiir := 'm';
                        end;
      //beolvasasa a lepeseknek
      AssignFile(stock,'steps.csv');
@@ -1812,8 +1869,8 @@ begin
          begin
               viz:='vizszintesen';
          end;
-         Memo1.Lines.Add(list[0]+'. lepes: '+sLineBreak+'A '+FloatToStr(StrToFloat(list[5])/faktor)+' szelessegu es '+FloatToStr(StrToFloat(list[6])/faktor)+' hosszusagu elemet vegye kezhez!'+sLineBreak+
-         'Vagjuk el '+viz +' '+FloatToStr(StrToFloat(list[4])/faktor)+' pozicioban! '+sLineBreak+'(ha vizszintes a vagas, akkor nyilvan az elem magassagara ertendo a pozicio, ha pedig fuggoleges akkor a szelessegere)');
+         Memo1.Lines.Add(list[0]+'. lépés: '+sLineBreak+'A '+FloatToStr(StrToFloat(list[5])/faktor)+' '+kiir+' szélességű és '+FloatToStr(StrToFloat(list[6])/faktor)+' '+kiir+' hosszúságú elemet vegye kézhez!'+sLineBreak+
+         'Vágjuk el '+viz +' '+FloatToStr(StrToFloat(list[4])/faktor)+' '+kiir+' pozícióban! '+sLineBreak+'(ha vízszintes a vágás, akkor nyilván az elem magasságára értendő a pozíció, ha pedig függőleges akkor a szélességére)');
           bmp:= TBGRABitmap.Create;
            try
             svg:= TBGRASVG.Create('temp'+IntToStr(StrToint(list[0])-1)+'.svg');
@@ -1861,6 +1918,7 @@ var
   svg: TBGRASVG;
   faktor: integer;
   stock: TextFile;
+  kiir: ansistring;
   i: Integer;
   line,listboxline, viz: ansistring;
   list: TStringList;
@@ -1868,18 +1926,22 @@ begin
      if combobox1.Items[combobox1.ItemIndex]='mm' then
                        begin
                             faktor := 1;
+                            kiir := 'mm';
                        end;
                        if combobox1.Items[combobox1.ItemIndex]='cm' then
                        begin
                             faktor := 10;
+                            kiir := 'cm';
                        end;
                        if combobox1.Items[combobox1.ItemIndex]='dm' then
                        begin
                             faktor := 100;
+                            kiir := 'dm';
                        end;
                        if combobox1.Items[combobox1.ItemIndex]='m' then
                        begin
                             faktor := 1000;
+                            kiir := 'm'
                        end;
      stepCount := stepCount -1;
 
@@ -1912,8 +1974,8 @@ begin
          begin
               viz:='vizszintesen';
          end;
-         Memo1.Lines.Add(list[0]+'. lepes: '+sLineBreak+'A '+FloatToStr(StrToFloat(list[5])/faktor)+' szelessegu es '+FloatToStr(StrToFloat(list[6])/faktor)+' hosszusagu elemet vegye kezhez!'+sLineBreak+
-         'Vagjuk el '+viz +' '+FloatToStr(StrToFloat(list[4])/faktor)+' pozicioban! '+sLineBreak+'(ha vizszintes a vagas, akkor nyilvan az elem magassagara ertendo a pozicio, ha pedig fuggoleges akkor a szelessegere)');
+        Memo1.Lines.Add(list[0]+'. lépés: '+sLineBreak+'A '+FloatToStr(StrToFloat(list[5])/faktor)+' '+kiir+' szélességű és '+FloatToStr(StrToFloat(list[6])/faktor)+' '+kiir+' hosszúságú elemet vegye kézhez!'+sLineBreak+
+         'Vágjuk el '+viz +' '+FloatToStr(StrToFloat(list[4])/faktor)+' '+kiir+' pozícióban! '+sLineBreak+'(ha vízszintes a vágás, akkor nyilván az elem magasságára értendő a pozíció, ha pedig függőleges akkor a szélességére)');
          bmp:= TBGRABitmap.Create;
            try
             svg:= TBGRASVG.Create('temp'+IntToStr(StrToint(list[0])-1)+'.svg');
@@ -1979,6 +2041,7 @@ var
   areaToBeCut: integer;
   maxwidth: integer;
   maxheight: integer;
+  exx: boolean;
   list: TStringList;
   selected: Rectangle;
   faktor: integer;
@@ -1987,6 +2050,17 @@ var
   s: string;
   ii, uu: integer;
 begin
+  exx:=false;
+  if notFirst=false then
+     begin
+       repeat
+       s:=(inputbox('Vágási szélesség', 'Mi legyen a vágási szélesség (mm-ben értendő)? Kérem egész számot adjon meg!', ''));
+        val(s,cutWidth,uu);
+        if s='' then exx:=true;
+       until ((uu=0) and (cutWidth>=0) and (cutWidth<MaxInt)) or exx ;
+     end;
+  if not exx then
+     begin
      //copypasta
      //ListBox1.Clear;
      //ListBox2.Clear;
@@ -2006,6 +2080,7 @@ begin
                        begin
                             faktor := 1000;
                        end;
+
      //DrawFPVectorialToCanvas('teszt.svg',Image1.Canvas);
      Button5.Enabled:=False;
      Button6.Enabled:=False;
@@ -2137,13 +2212,9 @@ begin
      end
      else
      begin
-     if notFirst=false then
+
+     if not exx then
      begin
-       repeat
-       s:=(inputbox('Vágási szélesség', 'Mi legyen a vágási szélesség (mm-ben értendő)? Kérem egész számot adjon meg!', '1'));
-        val(s,cutWidth,uu);
-       until ((uu=0) and (cutWidth>=0) and (cutWidth<MaxInt)) ;
-     end;
      stepCount := 0;
      Button5.Enabled:=False;
      Button6.Enabled:=False;
@@ -2170,6 +2241,9 @@ begin
      ProgressBar1.Position:=StrToInt(line);
      CloseFile(ex2);
      Timer1.Enabled := True;
+     end;
+
+     end;
      end;
 
 end;
@@ -2680,6 +2754,7 @@ procedure TForm1.Edit1Exit(Sender: TObject);
            s: string;
            vel: integer;
            uu: integer;
+           f: textfile;
   begin
        s := Edit1.Text;
        val(s,vel,uu);
@@ -2687,6 +2762,10 @@ procedure TForm1.Edit1Exit(Sender: TObject);
      begin
        Edit1.Text := '5';
        end;
+     assignfile(f, 'drop.txt');
+     rewrite(f);
+     writeln(f, Edit1.Text);
+     closefile(f);
   end;
 
 procedure TForm1.Edit1MouseLeave(Sender: TObject);
