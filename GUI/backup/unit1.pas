@@ -2051,6 +2051,16 @@ var
   ii, uu: integer;
 begin
   exx:=false;
+  if notFirst=false then
+     begin
+       repeat
+       s:=(inputbox('Vágási szélesség', 'Mi legyen a vágási szélesség (mm-ben értendő)? Kérem egész számot adjon meg!', ''));
+        val(s,cutWidth,uu);
+        if s='' then exx:=true;
+       until ((uu=0) and (cutWidth>=0) and (cutWidth<MaxInt)) or exx ;
+     end;
+  if not exx then
+     begin
      //copypasta
      //ListBox1.Clear;
      //ListBox2.Clear;
@@ -2070,6 +2080,7 @@ begin
                        begin
                             faktor := 1000;
                        end;
+
      //DrawFPVectorialToCanvas('teszt.svg',Image1.Canvas);
      Button5.Enabled:=False;
      Button6.Enabled:=False;
@@ -2183,7 +2194,7 @@ begin
               end;
               areaStock:=(sortstock[j].width*sortstock[j].height);
               //ShowMessage(IntToStr(areastock)+' >= '+IntToStr(areatobecut));
-              if (sortstock[j].alreadyWas=false) and ( areaStock>areatobecut ) and ((sortstock[j].width > maxwidth) or (sortstock[j].height > maxheight)) then
+              if (sortstock[j].alreadyWas=false) and ( areaStock>areatobecut ) and (((sortstock[j].width > maxwidth) and (sortstock[j].height > maxheight)) or ((sortstock[j].height > maxwidth) and (sortstock[j].width > maxheight)) ) then
               begin
                    sortstock[j].alreadyWas:=True;
                    selected:=sortstock[j];
@@ -2201,14 +2212,7 @@ begin
      end
      else
      begin
-     if notFirst=false then
-     begin
-       repeat
-       s:=(inputbox('Vágási szélesség', 'Mi legyen a vágási szélesség (mm-ben értendő)? Kérem egész számot adjon meg!', ''));
-        val(s,cutWidth,uu);
-        if s='' then exx:=true;
-       until ((uu=0) and (cutWidth>=0) and (cutWidth<MaxInt)) or exx ;
-     end;
+
      if not exx then
      begin
      stepCount := 0;
@@ -2239,6 +2243,7 @@ begin
      Timer1.Enabled := True;
      end;
 
+     end;
      end;
 
 end;
@@ -3134,7 +3139,7 @@ begin
                        CloseFile(stock);
                        F.LoadFromFile('stock.csv');
 
-                       F.Strings[whichLine]:=IntToStr(StrToInt(list[0])*faktor )+','+IntToStr(StrToInt(list[1])*faktor )+','+IntToStr( StrToInt(list[2])+count )+',';
+                       F.Strings[whichLine]:=FloatToStr(StrToInt(list[0])/faktor )+','+FloatToStr(StrToInt(list[1])/faktor )+','+IntToStr( StrToInt(list[2])+count )+',';
                        F.SaveToFile('stock.csv');
                     finally
                        F.Free;
@@ -3153,7 +3158,7 @@ begin
      begin
 
                 Append(stock);
-                WriteLn(stock,IntToStr(wwidth*faktor)+','+IntToStr(hheight*faktor)+','+IntToStr(count)+',');
+                WriteLn(stock,FloatToStr(wwidth/faktor)+','+FloatToStr(hheight/faktor)+','+IntToStr(count)+',');
                 CloseFile(stock);
      end;
      //beolvasasa a kivagando elemeknek es a keszlet elemeknek

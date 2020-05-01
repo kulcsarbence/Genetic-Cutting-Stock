@@ -2194,7 +2194,7 @@ begin
               end;
               areaStock:=(sortstock[j].width*sortstock[j].height);
               //ShowMessage(IntToStr(areastock)+' >= '+IntToStr(areatobecut));
-              if (sortstock[j].alreadyWas=false) and ( areaStock>areatobecut ) and ((sortstock[j].width > maxwidth) or (sortstock[j].height > maxheight)) then
+              if (sortstock[j].alreadyWas=false) and ( areaStock>areatobecut ) and (((sortstock[j].width > maxwidth) and (sortstock[j].height > maxheight)) or ((sortstock[j].height > maxwidth) and (sortstock[j].width > maxheight)) ) then
               begin
                    sortstock[j].alreadyWas:=True;
                    selected:=sortstock[j];
@@ -3905,7 +3905,7 @@ begin
                        CloseFile(stock);
                        F.LoadFromFile('stock.csv');
 
-                       F.Strings[whichLine]:=IntToStr(StrToInt(list[0])*faktor )+','+IntToStr(StrToInt(list[1])*faktor )+','+IntToStr( StrToInt(list[2])+count )+',';
+                       F.Strings[whichLine]:=IntToStr(StrToInt(list[0]) )+','+IntToStr(StrToInt(list[1]) )+','+IntToStr( StrToInt(list[2])+count )+',';
                        F.SaveToFile('stock.csv');
                     finally
                        F.Free;
@@ -3924,7 +3924,7 @@ begin
      begin
 
                 Append(stock);
-                WriteLn(stock,IntToStr(wwidth*faktor)+','+IntToStr(hheight*faktor)+','+IntToStr(count)+',');
+                WriteLn(stock,IntToStr(wwidth)+','+IntToStr(hheight)+','+IntToStr(count)+',');
                 CloseFile(stock);
      end;
      //beolvasasa a kivagando elemeknek es a keszlet elemeknek
