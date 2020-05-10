@@ -1,10 +1,6 @@
-// Genetic1.cpp : Defines the entry point for the console application.
-//
-
-#include "stdafx.h"
-//#define _CRTDBG_MAP_ALLOC
-//#include <stdlib.h>
-//#include <crtdbg.h>
+/*Including some header files...*/
+#include <stdlib.h>
+#include <crtdbg.h>
 #include <vector>
 #include <iostream>
 #include <random>
@@ -18,92 +14,55 @@
 #include "Step.hpp"
 #include "Base.hpp"
 #include "Entity.hpp"
+#include <memory>
 
-
-void fv() {
-	//_CrtDumpMemoryLeaks();
-}
 
 
 
 int main(int argc, char* argv[])
 {
-	//todo: mi van ha 23 550x1000 megy bele? akkor alapbol 50es ratioval akar dolgozni, ami rossz!
-	//cutWidthtel is mukodjon, szerintem azzal most hibasan mukodik
-	//mem szivargas ne legyen
-	//csinaljon output fajlt h mit hol kell kivagni...
-	//cnt sorrend igazodjon az LKO cucchoz itt lentebb
-	//ha tul sokaig szamol, induljon elolrol, ne legyen az hibas mukodes, talan ehhez a mem szivargast meg kene szuntetni, mert a masodik
-	//futasnal mindig belassul
-	
-	
-	//Kitorlunk mindent a ready mappabol
+	/*The previous .svg files will get deleted*/
 	std::string command = "del /Q ";
 	std::string cur_dir(argv[0]);
 	int pos = cur_dir.find_last_of("/\\");
 	std::string path = cur_dir.substr(0, pos) + "\\*.svg";
 	std::cout << path << std::endl;
 	system(command.append(path).c_str());
-	//vege a torlesnek
 
 	int ratio;
 	int mutationChanceC = 7;
 	int generation = 0;
-	std::ifstream basicInput("exchange.txt");
+	std::ifstream basicInput("exchange.txt"); //exchange.txt stores some pretty important parameters.
 	std::string line;
 	std::getline(basicInput, line);
-	int ww = std::stoi(line);
+	int ww = std::stoi(line); //ww is the width of the main rectangle
 	std::getline(basicInput, line);
-	int hh = std::stoi(line);
+	int hh = std::stoi(line); //hh is the width of the main rectangle
 	std::getline(basicInput, line);
-	int cutWidth = std::stoi(line);
+	int cutWidth = std::stoi(line); //cutWidth is the width of the cuts
 	std::getline(basicInput, line);
-	int populationSize = std::stoi(line);
+	int populationSize = std::stoi(line); //populationSize is the size of the population
 	std::getline(basicInput, line);
-	int genS = std::stoi(line);
+	int genS = std::stoi(line); //genS is the number of generations
 	basicInput.close();
-	
-	Base* alap = new Base(ww, hh, 0, 0);
-	std::vector<Base*> baseVector;
+
+	std::shared_ptr<Base> alap{ new Base(ww, hh, 0, 0) }; //'alap' is the MAIN/BASE rectangle
+	std::vector<std::shared_ptr<Base>> baseVector;
 	baseVector.push_back(alap);
-	std::vector<Entity*> population;
-	std::vector<Entity*> readyPop;
-	std::vector<Base*> theseToBeCut;
+	std::vector<std::shared_ptr<Entity>> population;  //'population' stores all the initial entities
+	std::vector<std::shared_ptr<Entity>> readyPop; //'readyPop' stores all the entities that reached a solution. The best solution is going to be chosen from this vector.
+	std::vector<std::shared_ptr<Base>> theseToBeCut; //'theseToBeCut' stores all the rectangles that we want to cut out.
 	std::vector<int> cnt;
-	/*for (int i = 0; i < 100; i++) {
-		theseToBeCut.push_back(new Base(60, 60, 0, 0));
-	}*/
 	File toBeCut("tobecut.csv");
-	theseToBeCut = toBeCut.readStockFromCSV();
-	/*theseToBeCut.push_back(new Base(200, 200, 0, 0));
-
-	theseToBeCut.push_back(new Base(200, 200, 0, 0));
-
-	theseToBeCut.push_back(new Base(100, 100, 0, 0));
-	theseToBeCut.push_back(new Base(100, 100, 0, 0));
-	theseToBeCut.push_back(new Base(100, 100, 0, 0));
-	theseToBeCut.push_back(new Base(50, 50, 0, 0));
-	theseToBeCut.push_back(new Base(50, 50, 0, 0));
-	theseToBeCut.push_back(new Base(50, 50, 0, 0));
-	theseToBeCut.push_back(new Base(200, 200, 0, 0));*/
-	/*cnt.push_back(23);
-	cnt.push_back(3);
-	cnt.push_back(1);
-	cnt.push_back(2);
-	cnt.push_back(1);
-	cnt.push_back(3);*/
-
-	/*std::sort(theseToBeCut.begin(), theseToBeCut.end(), [](Base* a, Base* b) {return std::abs(a->getHeight()-a->getWidth()) > std::abs(b->getHeight()-b->getWidth()) ? true : 
-		std::abs(a->getHeight()-a->getWidth())==std::abs(b->getHeight()-b->getWidth()) ? a->getHeight()*a->getWidth()
-		>b->getHeight()*b->getWidth() ? true : false : false ; });*/
-	std::sort(theseToBeCut.begin(), theseToBeCut.end(), [](Base* a, Base* b) {return a->getWidth()*a->getHeight() > b->getWidth()*b->getHeight(); });
+	theseToBeCut = toBeCut.readStockFromCSV(); //The planks that we want to cut out are being read in.
+	std::sort(theseToBeCut.begin(), theseToBeCut.end(), [](std::shared_ptr<Base> a, std::shared_ptr<Base> b) {return a->getWidth()*a->getHeight() > b->getWidth()*b->getHeight(); }); //The planks are sorted based on their area.
 	for (auto a : theseToBeCut) {
 		std::cout << a->getHeight() << ", " << a->getWidth() << "\n";
 	}
 	int itemTypeCounter = 1;
 	int currentWidth = theseToBeCut[0]->getWidth();
 	int currentHeight = theseToBeCut[0]->getHeight();
-	for (int i = 0; i < theseToBeCut.size() - 1; i++) {
+	for (int i = 0; i < theseToBeCut.size() - 1; i++) { //the 'cnt' vector gets loaded with new elements, this vector will help the entities to calculate their own fitness values
 		currentWidth = theseToBeCut[i]->getWidth();
 		currentHeight = theseToBeCut[i]->getHeight();
 		if (theseToBeCut[i + 1]->getHeight() == currentHeight && theseToBeCut[i + 1]->getWidth() == currentWidth) {
@@ -126,14 +85,12 @@ int main(int argc, char* argv[])
 
 	std::sort(items.begin(), items.end(), [](int a, int b) {return a < b; });
 
+	ratio = LKO(theseToBeCut[0]->getWidth(), theseToBeCut[0]->getHeight()); //The ratio gets calculated. In the current version it is DEPRECATED.
 
-	//ratio = LKOarr(items);
-	ratio = LKO(theseToBeCut[0]->getWidth(), theseToBeCut[0]->getHeight());
+	std::cout << "Ratio: " << ratio << std::endl; 
 
-	std::cout << "Ratio: " << ratio << std::endl;
-
-	for (int i = 0; i < populationSize; i++) {
-		population.push_back(new Entity(baseVector, cutWidth, theseToBeCut, cnt, ratio));
+	for (int i = 0; i < populationSize; i++) { //The initial population is created. Every Entity is forced to make cuts.
+		population.push_back(std::make_shared<Entity>( Entity(baseVector, cutWidth, theseToBeCut, cnt, ratio)));
 		population[i]->calculateFitness(false);
 		population[i]->makeCuts();
 		population[i]->calculateFitness(false);
@@ -142,14 +99,14 @@ int main(int argc, char* argv[])
 	int fittestValue = 0;
 	int leastfitPos = 0;
 	int leastfitValue = 0;
-	std::vector<Entity*> newGen;
+	std::vector<std::shared_ptr<Entity>> newGen; //newGen will always hold the newest generation in every iteration.
 
-	//while (fittestValue < theseToBeCut.size()) {
-	while((/*readyPop.size()<=populationSize/2 && */generation<genS)){
+	
+	while(generation<genS){ //the iteration goes on until the current generation=genS
 
-		int chosenEntityPos = 0;
+		int chosenEntityPos = 0; //the position of the Entity in the population vector, that gets to reproduce
 
-		for (int k = 0; k < population.size(); k++) {
+		for (int k = 0; k < population.size(); k++) { //in this cycle the new generation is created, with the same size as its parent generation
 			bool canMate = false;
 			bool hiba = false;
 			chosenEntityPos = 0;
@@ -157,21 +114,14 @@ int main(int argc, char* argv[])
 			while (!hiba && (!canMate || population[chosenEntityPos]->getatMax() == true)) {
 
 				chosenEntityPos = getRandom(0, population.size() -1);
-				/*if (population[chosenEntityPos]->getFitness() >=
-				getRandom(std::round(fittestValue - fittestValue / 10), fittestValue)
-				) {
-				canMate = true;
-				}*/
-				//std::cout << leastfitValue << std::endl;
-				//std::cout << fittestValue << std::endl;
 				if (population[chosenEntityPos]->getFitness() >=
 					getRandom((leastfitValue+fittestValue)/2, fittestValue
-					)) {
+					)) { //the higher an entities fitness is, the higher its chance is to reproduce
 					canMate = true;
 				}
 
 				counter++;
-				if (counter > population.size() * 10) {
+				if (counter > population.size() * 10) { //if the cycle goes on for too long without any success, the 'hiba' boolean is given a new value, 'True'
 					canMate = true;
 					hiba = true;
 				}
@@ -180,60 +130,51 @@ int main(int argc, char* argv[])
 			if (!hiba) {
 				newGen.push_back(population[chosenEntityPos]->reproduce());
 			}
-			else {
-				newGen.push_back(new Entity(baseVector, cutWidth, theseToBeCut, cnt, ratio));
+			else { //if 'hiba' is True, then instead of reproducing an old Entity, a new Entity gets created.
+				newGen.push_back(std::make_shared<Entity>( Entity(baseVector, cutWidth, theseToBeCut, cnt, ratio)));
 			}
 			
 		}
 
-		int mutationChance = 0;
+		int mutationChance = 0; //this is a local variable, the real mutation chance is stored in the 'mutationChanceC' variable (by default it is set to 7%)
 		for (int j = 0; j < newGen.size(); j++) {
 			mutationChance = getRandom(0, 100);
 			newGen[j]->calculateFitness(false);
-			if(newGen[j]->getatMax()==false){
+			if(newGen[j]->getatMax()==false){ //If the current Entity has not yet reached a solution
 				int before = newGen[j]->getFitness();
 				int befSize = newGen[j]->getBaseVect().size();
-				for(int q = 0; q<getRandom(1,theseToBeCut.size()) && newGen[j]->getatMax()==false; q++){
+				for(int q = 0; q<getRandom(1,theseToBeCut.size()) && newGen[j]->getatMax()==false; q++){ //The Entity is forced to make cuts 'q' times
 				newGen[j]->calculateFitness(false);
 				newGen[j]->makeCuts();
 				newGen[j]->calculateFitness(false);
 				}
 				int after = newGen[j]->getFitness();
 				int afSize = newGen[j]->getBaseVect().size();
-				if (after <= before && (newGen[j]->getBaseVect().size() >= 3 * theseToBeCut.size() ) && getRandom(1,12)==5) {
-					//std::cout << "baseVectSize: " << newGen[j]->getBaseVect().size() << "\t theseToBeCut size: " << theseToBeCut.size() << std::endl;
-					newGen[j] = new Entity(baseVector, cutWidth, theseToBeCut, cnt, ratio);
+				if (after <= before && (newGen[j]->getBaseVect().size() >= 3 * theseToBeCut.size() ) && getRandom(1,12)==5) { //if this special value is True, then the 'j'-th Entity gets replaced with a new Entity
+					newGen[j] = std::make_shared<Entity>(  Entity(baseVector, cutWidth, theseToBeCut, cnt, ratio) );
 					newGen[j]->calculateFitness(false);
 				}
 			}
 			newGen[j]->calculateFitness(false);
 			if (mutationChance > (100 - mutationChanceC)) {
-				newGen[j]->mutate();
+				newGen[j]->mutate(); //The Entity is mutated by changing its 'stepVar' variable.
 			}
 		}
 
 
-		/*for (auto d : population) {
-			delete d;
-		}*/
-		for (auto p : population) {
+		
+		for (auto p : population) { //Every Entity that has reached a solution is saved in the 'readyPop' vector.
 			if (p->getatMax() == true) {
 				readyPop.push_back(p);
 			}
 		}
 		population.clear();
-		/*for (int j = 0; j < newGen.size(); j++) {
-		population.push_back(newGen[j]);
-		}*/
 		population = newGen;
-		/*for (auto d : newGen) {
-		delete d;
-		}*/
 		newGen.clear();
 		if(population.size()>0){
 		fittestPos = 0;
 		fittestValue = population[fittestPos]->getFitness();
-		for (int j = 0; j < population.size(); j++) {
+		for (int j = 0; j < population.size(); j++) { //the fittest Entity's position and fitness value is calculated.
 			if (population[j]->getFitness() > population[fittestPos]->getFitness()) {
 				fittestPos = j;
 				fittestValue = population[j]->getFitness();
@@ -241,7 +182,7 @@ int main(int argc, char* argv[])
 		}
 		leastfitPos = 0;
 		leastfitValue = population[leastfitPos]->getFitness();
-		for (int j = 0; j < population.size(); j++) {
+		for (int j = 0; j < population.size(); j++) { //the most unfit Entity's position and fitness value is calculated.
 			if (population[j]->getFitness() < population[leastfitPos]->getFitness()) {
 				leastfitPos = j;
 				leastfitValue = population[j]->getFitness();
@@ -255,13 +196,11 @@ int main(int argc, char* argv[])
 
 
 		std::ofstream file;
-		file.open("temp.svg");
+		file.open("temp.svg"); //The current fittest Entity's solution is generated as an .SVG file
 		file << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">";
 		file << "<svg " << "xmlns=\"http://www.w3.org/2000/svg\"" << " width=\"" << alap->getWidth() << "\" " <<
 			"height=\"" << alap->getHeight() << "\">";
 		for (auto a : population[fittestPos]->getBaseVect()) {
-			//std::cout << "Szelessege: " << a->getWidth() << "  Magassaga: " << a->getHeight() << std::endl;
-			//std::cout << "X pozicioja: " << a->getX() << "  Y pozicioja: " << a->getY() << std::endl;
 			file << "<rect x=\"" << a->getX() << "\" " <<
 				"y=\"" << a->getY() << "\" " << "width=\"" << a->getWidth() << "\" "
 				<< "height=\"" << a->getHeight() << "\" " <<
@@ -274,33 +213,15 @@ int main(int argc, char* argv[])
 		}
 		std::cout << "Population size: " << population.size() << std::endl;
 
-		std::ofstream file4("progress.txt");
+		std::ofstream file4("progress.txt"); //The text file is updated. If it reaches genS-1, the algorithm completed the task.
 		file4 << std::to_string(generation);
 		file4.close();
 		generation++;
 		std::cout << "Readypop size: " << readyPop.size() << std::endl;
 		std::cout << "Generation: " << generation << ", highest fitness: " << fittestValue << "\tLowest fitness: "<<leastfitValue<< std::endl;
 		
-		//	}
 	}
 	int area = 0;
-	/*for (int a1 = 0; a1 < population[fittestPos]->getBaseVect().size(); a1++) {
-	for (int a2 = 0; a2 < population[fittestPos]->getBaseVect()[a1]->getHeight(); a2++) {
-	for (int a3 = 0; a3 < population[fittestPos]->getBaseVect()[a1]->getWidth(); a3++) {
-	std::cout << "X";
-	area++;
-	}
-	std::cout << std::endl;
-	}
-	std::cout << std::endl;
-	}*/
-	//
-	// ez
-	/*if (readyPop.size() > populationSize / 2) {
-		std::ofstream fileP("progress.txt");
-		fileP << std::to_string(9999999);
-		fileP.close();
-	}*/
 
 	if(readyPop.size()>0){
 	for (auto a : readyPop) {
@@ -331,13 +252,11 @@ int main(int argc, char* argv[])
 	std::cout << leastfitValue << std::endl;
 
 	std::ofstream file;
-	file.open("teszt.svg");
+	file.open("teszt.svg"); //The fittest Entity's solution (from the 'readyPop' vector) is generated as an .SVG file
 	file << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">";
 	file << "<svg " << "xmlns=\"http://www.w3.org/2000/svg\"" << " width=\"" << alap->getWidth() << "\" " <<
 		"height=\"" << alap->getHeight() << "\">";
 	for (auto a : readyPop[fittestPos]->getBaseVect()) {
-		//std::cout << "Szelessege: " << a->getWidth() << "  Magassaga: " << a->getHeight() << std::endl;
-		//std::cout << "X pozicioja: " << a->getX() << "  Y pozicioja: " << a->getY() << std::endl;
 		file << "<rect x=\"" << a->getX() << "\" " <<
 			"y=\"" << a->getY() << "\" " << "width=\"" << a->getWidth() << "\" "
 			<< "height=\"" << a->getHeight() << "\" " <<
@@ -348,13 +267,11 @@ int main(int argc, char* argv[])
 	file.close();
 
 	std::ofstream file2;
-	file2.open("rossz.svg");
+	file2.open("rossz.svg"); //The most unfit Entity's solution (from the 'readyPop' vector) is generated as an .SVG file
 	file2 << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">";
 	file2 << "<svg " << "xmlns=\"http://www.w3.org/2000/svg\"" << " width=\"" << alap->getWidth() << "\" " <<
 		"height=\"" << alap->getHeight() << "\">";
 	for (auto a : readyPop[leastfitPos]->getBaseVect()) {
-		//std::cout << "Szelessege: " << a->getWidth() << "  Magassaga: " << a->getHeight() << std::endl;
-		//std::cout << "X pozicioja: " << a->getX() << "  Y pozicioja: " << a->getY() << std::endl;
 		file2 << "<rect x=\"" << a->getX() << "\" " <<
 			"y=\"" << a->getY() << "\" " << "width=\"" << a->getWidth() << "\" "
 			<< "height=\"" << a->getHeight() << "\" " <<
@@ -365,13 +282,12 @@ int main(int argc, char* argv[])
 	file2.close();
 
 	
-	std::ofstream file3("steps.csv");
+	std::ofstream file3("steps.csv"); //The fittest Entity's steps are generated as a .CSV file
 	int soCounter = 1;
 	for (int helper = 0; helper < readyPop[fittestPos]->getSteps().size(); helper++) {
-		if (dynamic_cast<NocutStep*>(readyPop[fittestPos]->getSteps()[helper]) != nullptr) {
-			//std::cout << "no cut step" << std::endl;
+		if (std::dynamic_pointer_cast<std::shared_ptr<NocutStep>>(readyPop[fittestPos]->getSteps()[helper]) != nullptr) {
 		}
-		if (dynamic_cast<VerticalStep*>(readyPop[fittestPos]->getSteps()[helper]) != nullptr) {
+		if (std::dynamic_pointer_cast<std::shared_ptr<VerticalStep>>(readyPop[fittestPos]->getSteps()[helper]) != nullptr) {
 			file3 << std::to_string(soCounter++) << ",0,";
 			file3 << readyPop[fittestPos]->getSteps()[helper]->getBase()->getX()+ readyPop[fittestPos]->getSteps()[helper]->getPos() << ",";
 			file3 << readyPop[fittestPos]->getSteps()[helper]->getBase()->getY() << ",";
@@ -380,7 +296,7 @@ int main(int argc, char* argv[])
 			file3 << readyPop[fittestPos]->getSteps()[helper]->getBase()->getHeight() << ",";
 			file3 << "\n";
 		}
-		if (dynamic_cast<HorizontalStep*>(readyPop[fittestPos]->getSteps()[helper]) != nullptr) {
+		if (std::dynamic_pointer_cast<std::shared_ptr<HorizontalStep>>(readyPop[fittestPos]->getSteps()[helper]) != nullptr) {
 			file3 << std::to_string(soCounter++) << ",1,";
 			file3 << readyPop[fittestPos]->getSteps()[helper]->getBase()->getX() << ",";
 			file3 << readyPop[fittestPos]->getSteps()[helper]->getBase()->getY()+ readyPop[fittestPos]->getSteps()[helper]->getPos() << ",";
@@ -392,29 +308,18 @@ int main(int argc, char* argv[])
 	}
 	file3.close();
 	readyPop[fittestPos]->calculateFitness(true);
-	Entity* writeOut = new Entity(baseVector, cutWidth, theseToBeCut, cnt, ratio);
+	std::shared_ptr<Entity> writeOut{ new Entity(baseVector, cutWidth, theseToBeCut, cnt, ratio) };
 	writeOut->makeCutsByGivenSteps(readyPop[fittestPos]->getSteps());
 	}
-	else {
+	else { //If the task cannot be completed, e.g. the plank's area that we want to cut out is bigger than the MAIN PLANK's area
 		std::cout << "nem vaghato ki" << std::endl;
 		std::ofstream file4("progress.txt");
-		file4 << std::to_string(-1);
+		file4 << std::to_string(-1); //Then the 'progress.txt' file's stored value is going to be -1
 		file4.close();
 	}
 
-	
-	std::cout << "VEGE" << std::endl;
+	std::cout << "VEGE" << std::endl; //End of the algorithm.
 
-	for (auto d : baseVector) {
-		delete d;
-	}
-	for (auto d : newGen) {
-		delete d;
-	}
-	for (auto d : theseToBeCut) {
-		delete d;
-	}
-	fv();
 	return 0;
 }
 

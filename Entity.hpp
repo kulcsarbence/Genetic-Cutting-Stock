@@ -2,19 +2,20 @@
 #include "Base.hpp"
 
 class Entity {
-	Base* firstBaseVect;
-	std::vector<Base*> baseVect;
-	std::vector<Base*> whichBasesToBeCut;
-	std::vector<Step*> steps;
-	std::vector<int> cnt;
-	int ratio;
-	double wastePercentage;
-	int cutWidth;
-	int bigCounter = 0;
-	int stepVar;
-	int fitness = 0;
-	bool atMax = false;
-	//	int badCounter = 0;
+	/*This class represents an entity from the population whose main task is to perform cuts in a semi-random order.
+	As the fitness of the entity gets bigger, so does the chance for it to reproduce go higher.*/
+	std::shared_ptr<Base> firstBaseVect; //The original big plank, from which everything needs to be cut out.
+	std::vector<std::shared_ptr<Base>> baseVect; //A vector containing the current rectangles. After every makeCuts() method call, it gets refreshed with new elements
+	std::vector<std::shared_ptr<Base>> whichBasesToBeCut; //A vector containing the items that are needed to be cut out from the 'firstBaseVect' rectangle
+	std::vector<std::shared_ptr<Step>> steps; //A vector containing all the steps the given Entity has made.
+	std::vector<int> cnt; //A vector that helps to process some calculations in the calculateFitness() method.
+	int ratio; //The current ratio of the cutting sizes, DEPRECATED.
+	double wastePercentage; //The percentage of the waste that derives from the cutting processes.
+	int cutWidth; //The width of the cuts (symmetrical - it means that if cutWidth is 1, then 1+1=2 will be the actual cutWidth given how the blade works in real applications).
+	int bigCounter = 0; //A counter that helps in some minor calculations.
+	int stepVar; //The higher this variable's value is, the lower the chance for the Entity to cut into the next rectangle it stores in its 'baseVect' vector.
+	int fitness = 0; //The fitness of the Entity.
+	bool atMax = false; //If 'True' then the Entity has reached a solution.
 public:
 	void setFitness(int mennyire) {
 		fitness = mennyire;
@@ -25,22 +26,14 @@ public:
 	bool getatMax() {
 		return atMax;
 	}
-	~Entity() {
-		//delete firstBaseVect;
-		/*for (auto a : steps) {
-			delete a;
-		}*/
-	}
-	Entity(std::vector<Base*>& baseV, int cutW, std::vector<Base*>& whichToBeCut, std::vector<int> cnt, int r) : baseVect(baseV), cutWidth(cutW) {
+	Entity(std::vector<std::shared_ptr<Base>> baseV, int cutW, std::vector<std::shared_ptr<Base>> whichToBeCut, std::vector<int> cnt, int r) : baseVect(baseV), cutWidth(cutW) {
 		firstBaseVect = baseV[0];
 		this->cnt = cnt;
 		ratio = r;
 		whichBasesToBeCut = whichToBeCut;
 		stepVar = 3;
-		//steps.clear();
 	}
-	Entity(Base* firstBaseVect, std::vector<Step*> stepss, int cutW, std::vector<Base*> whichToBeCut, std::vector<int> cnt, int r) : cutWidth(cutW) {
-		//steps.clear();
+	Entity(std::shared_ptr<Base> firstBaseVect, std::vector<std::shared_ptr<Step>> stepss, int cutW, std::vector<std::shared_ptr<Base>> whichToBeCut, std::vector<int> cnt, int r) : cutWidth(cutW) {
 		stepVar = 3;
 		ratio = r;
 		baseVect.push_back(firstBaseVect);
@@ -55,10 +48,8 @@ public:
 			calculateFitness(false);
 			makeCuts();
 		}
-		//calculateFitness();
 	}
-	Entity(Base*& firstBaseVect, std::vector<Base*>& baseVV, std::vector<Step*>& stepss, int cutW, std::vector<Base*>& whichToBeCut, std::vector<int> cnt, int r, int s) : cutWidth(cutW) {
-		//steps.clear();
+	Entity(std::shared_ptr<Base> firstBaseVect, std::vector<std::shared_ptr<Base>> baseVV, std::vector<std::shared_ptr<Step>> stepss, int cutW, std::vector<std::shared_ptr<Base>> whichToBeCut, std::vector<int> cnt, int r, int s) : cutWidth(cutW) {
 		stepVar = s;
 		ratio = r;
 		baseVect.push_back(firstBaseVect);
@@ -73,58 +64,42 @@ public:
 			calculateFitness(false);
 			makeCuts();
 		}
-		//calculateFitness();
 	}
-	std::vector<Base*> getBaseVect() {
+	std::vector<std::shared_ptr<Base>> getBaseVect() {
 		return baseVect;
 	}
-	std::vector<Step*> getSteps() {
+	std::vector<std::shared_ptr<Step>> getSteps() {
 		return steps;
 	}
-	Base* getFirstBaseVect() {
+	std::shared_ptr<Base> getFirstBaseVect() {
 		return firstBaseVect;
 	}
-	Entity* reproduce() {
-		Entity* toReturn;
+	std::shared_ptr<Entity> reproduce() {
+		/*In the current version, this function returns a new Entity that derives from its parent.*/
+		std::shared_ptr<Entity> toReturn;
 		int ratioToGive = ratio;
-		std::vector<Step*> newSteps;
-		//std::cout << "before" << std::endl;
-		//int crossOverPoint = getRandom(1, steps.size()); //VIGYAZAT, ESZERINT LEGALABB EGY LEPES KELL LEGYEN MINDIG HAHA
+		std::vector<std::shared_ptr<Step>> newSteps;
 		int cuccli = steps.size();
 		int crossOverPoint;
 		if (steps.size() > 0 && steps.size() < (whichBasesToBeCut.size() * 30)) {
 			crossOverPoint = getRandom(steps.size(), cuccli);
-			//std::cout << "kezdet" << std::endl;
 			while (steps[crossOverPoint - 1]->getBorder() == false) {
 				crossOverPoint = getRandom(steps.size() , cuccli);
 				ratioToGive = LKO(steps[crossOverPoint - 1]->getBase()->getHeight(), steps[crossOverPoint - 1]->getBase()->getWidth());
-				//std::cout << ratioToGive << std::endl;
 			}
-			//std::cout << "out of range" << std::endl;
 		}
 		else {
 			crossOverPoint = 0;
-			/*for (auto a : steps) {
-				delete a;
-			}*/ //ITT HIBA VAN!!!!! nezd meg, kiirja h van mit belepusholni ha ez ON
 			ratioToGive = LKO(firstBaseVect->getWidth(), firstBaseVect->getHeight());
-			/*while (steps[crossOverPoint - 1]->getBorder() == false) {
-			crossOverPoint = getRandom(1, 2);
-			}*/
 		}
-		/*if (getRandom(1, 10) == 5) {
-		crossOverPoint = 1;
-		}*/
-		//	int crossOverPoint = 0;
 		for (int i = 0; i < crossOverPoint; i++) {
 			newSteps.push_back(steps[i]);
 		}
-		//steps.clear();
-		//std::cout << "after" << std::endl;
-		toReturn = new Entity(firstBaseVect, baseVect, newSteps, cutWidth, whichBasesToBeCut, this->cnt, this->ratio, stepVar);
+		toReturn = std::make_shared<Entity>(  Entity(firstBaseVect, baseVect, newSteps, cutWidth, whichBasesToBeCut, this->cnt, this->ratio, stepVar) );
 		return toReturn;
 	}
 	void mutate() {
+		/*This method mutates the 'stepVar' variable by changing its value by 1.*/
 		int od = getRandom(1, 2);
 		if (od == 2) {
 			stepVar = stepVar - 1;
@@ -133,18 +108,16 @@ public:
 			stepVar = stepVar + 1;
 		}
 	}
-	void mutateStep() {
-		/*int whichStepToMutate = getRandom(0, steps.size() - 1);
-		steps*/
-	}
 	int getFitness() {
 		return fitness;
 	}
 	int calculateFitness(bool check) {
+		/*This method calculates the current fitness level of the Entity.
+		The higher the number of the rectangles that the Entity managed to cut out, the higher its fitness value will become.*/
 		atMax = false;
 		int allArea = firstBaseVect->getHeight() * firstBaseVect->getWidth();
 		int goodArea = 0;
-		std::vector<Base*> theseToBeCut = whichBasesToBeCut;
+		std::vector<std::shared_ptr<Base>> theseToBeCut = whichBasesToBeCut;
 		std::vector<bool> alreadyWas;
 		for (int j = 0; j < theseToBeCut.size(); j++) {
 			alreadyWas.push_back(false);
@@ -162,26 +135,16 @@ public:
 			for (int j = 0; j < theseToBeCut.size(); j++) {
 				if ((baseVect[i]->getHeight() == theseToBeCut[j]->getHeight()) && (baseVect[i]->getWidth() == theseToBeCut[j]->getWidth()) && !alreadyWas[j]) {
 					fitness++;
-					//theseToBeCut.erase(std::find(theseToBeCut.begin(), theseToBeCut.end(), element));
 					alreadyWas[j] = true;
 					cnter++;
-					baseVect[i]->setAccepted(true);////
-					if (check) {
-						//std::cout << "Already was: " << theseToBeCut[j]->getWidth() << " x " << theseToBeCut[j]->getHeight() << std::endl;
-					}
+					baseVect[i]->setAccepted(true);
 					break;
 				}
 				else if ((baseVect[i]->getHeight() == theseToBeCut[j]->getWidth()) && (baseVect[i]->getWidth() == theseToBeCut[j]->getHeight()) && !alreadyWas[j]) {
 					fitness++;
-					//theseToBeCut.erase(std::find(theseToBeCut.begin(), theseToBeCut.end(), element));
 					alreadyWas[j] = true;
 					cnter++;
-					//std::cout<<"forditott"<<std::endl;
-					//goodArea += theseToBeCut[j]->getHeight() * theseToBeCut[j]->getWidth();
-					baseVect[i]->setAccepted(true);////
-					if (check) {
-						//std::cout << "Already was: " << theseToBeCut[j]->getWidth() << " x " << theseToBeCut[j]->getHeight() << std::endl;
-					}
+					baseVect[i]->setAccepted(true);
 					break;
 				}
 			}
@@ -198,7 +161,6 @@ public:
 						if (temp < whichBasesToBeCut.size()) {
 							ratio = LKO(whichBasesToBeCut[temp]->getWidth(), whichBasesToBeCut[temp]->getHeight());
 						}
-						//std::cout << "Cnter: " << cnter << std::endl << "Ratio: " << ratio << std::endl;
 					}
 				}
 				this->bigCounter = cnter;
@@ -213,72 +175,38 @@ public:
 		if (check) {
 			return cucc;
 		}
-		//std::cout << cucc << std::endl;
 		fitness = fitness * 10;
 		if (atMax) {
-			//fitness = fitness + (int)(100 - cucc)/10;
 			wastePercentage = (double)(cucc);
 		}
 		return 0;
-		/*for (int i = 0; i < baseVect.size(); i++) {
-		int j = 0;
-		bool feltetel = (baseVect[i]->getHeight() == theseToBeCut[j]->getHeight()) && (baseVect[i]->getWidth() == theseToBeCut[j]->getWidth());
-		bool feltetelForditva = (baseVect[i]->getHeight() == theseToBeCut[j]->getWidth()) && (baseVect[i]->getWidth() == theseToBeCut[j]->getHeight());
-		if (feltetel || feltetelForditva) {
-		fitness++;
-		theseToBeCut.erase(std::find(theseToBeCut.begin(), theseToBeCut.end(), theseToBeCut[j]));
-		}
-		while ((!feltetel) && (!feltetelForditva) && (j<theseToBeCut.size()-1)) {
-		j++;
-		feltetel = (baseVect[i]->getHeight() == theseToBeCut[j]->getHeight()) && (baseVect[i]->getWidth() == theseToBeCut[j]->getWidth());
-		feltetelForditva = (baseVect[i]->getHeight() == theseToBeCut[j]->getWidth()) && (baseVect[i]->getWidth() == theseToBeCut[j]->getHeight());
-		if (feltetel || feltetelForditva) {
-		fitness++;
-		theseToBeCut.erase(std::find(theseToBeCut.begin(), theseToBeCut.end(), theseToBeCut[j]));
-		}
-		}
-		}*/
 	}
 	int totalArea() {
+		/*Returns the total area of all the rectangles in the 'baseVect' container.*/
 		int area = 0;
 		for (int k = 0; k < baseVect.size(); k++) {
 			area = area + baseVect[k]->getHeight() * baseVect[k]->getWidth();
 		}
 		return area;
 	}
-	void makeCutsByGivenSteps(std::vector<Step*> stepps) {
-		std::vector<Base*> newBaseVect;
+	void makeCutsByGivenSteps(std::vector<std::shared_ptr<Step>> stepps) {
+		/*This method simulates the steps an Entity made using the 'stepps' vector.
+		It also generates files corresponding to each step.*/
+		std::vector<std::shared_ptr<Base>> newBaseVect;
 		
 		int vectCounter = 0;
 		int someCounter = 0;
 
 		for (int i = 0; i < stepps.size(); i++) {
-			std::vector<Base*> temp;
-			for (auto a : temp) {
-				delete a;
-			}
-			//std::cout << "VectCounter: " << vectCounter << std::endl;
+			std::vector<std::shared_ptr<Base>> temp;
 			std::cout << "Steppsben levo base: " << stepps[i]->getBase()->getWidth() << " * " << stepps[i]->getBase()->getHeight() << std::endl;
-			std::cout << "BaseVectben levo base: " << vectCounter <<" : "<< baseVect[vectCounter]->getWidth() << " * " << baseVect[vectCounter]->getHeight() << std::endl;
 			
-			if (dynamic_cast<HorizontalStep*>(stepps[i]) != nullptr) {
+			if (std::dynamic_pointer_cast<std::shared_ptr<HorizontalStep>>(stepps[i]) != nullptr) {
 				steps.push_back(stepps[i]);
 				int whereToCut = stepps[i]->getPos();
 				std::cout << "Horizontal step. " << " WhereToCut: " << whereToCut << std::endl;
 				std::cout << "Ezen az elemen - width: " << baseVect[vectCounter]->getWidth() << " height: " << baseVect[vectCounter]->getHeight() << std::endl;
 				std::cout << std::endl;
-				//IDEIGLENES MEGOLDAS:
-				//IDEIGLENES MEGOLDAS:
-				//IDEIGLENES MEGOLDAS:
-				//IDEIGLENES MEGOLDAS:
-				/*if (whereToCut > baseVect[vectCounter]->getHeight() || whereToCut < 0) {
-					std::cout << "problem" << std::endl;
-					whereToCut = getRandom(0, baseVect[vectCounter]->getHeight());
-				}*/
-				//
-				//
-				//
-				//
 
 				temp = stepps[i]->getBase()->horizontalCut(whereToCut, cutWidth);
 				if (temp.size() > 0) {
@@ -288,19 +216,13 @@ public:
 				if (temp.size() > 1) {
 					newBaseVect.push_back(temp[1]);
 				}
-				
-				//vectCounter++;
 			}
-			if (dynamic_cast<VerticalStep*>(stepps[i]) != nullptr) {
+			if (std::dynamic_pointer_cast<std::shared_ptr<VerticalStep>>(stepps[i]) != nullptr) {
 				steps.push_back(stepps[i]);
 				int whereToCut = stepps[i]->getPos();
 				std::cout << "Vertical step. " << " WhereToCut: " << whereToCut << std::endl;
 				std::cout << "Ezen az elemen - width: " << baseVect[vectCounter]->getWidth() << " height: " << baseVect[vectCounter]->getHeight() << std::endl;
 				std::cout << std::endl;
-				/*if (whereToCut > baseVect[vectCounter]->getWidth() || whereToCut < 0) {
-					std::cout << "problem2" << std::endl;
-					whereToCut = getRandom(0, baseVect[vectCounter]->getWidth());
-				}*/
 
 				temp = stepps[i]->getBase()->verticalCut(whereToCut, cutWidth);
 				if (temp.size() > 0) {
@@ -309,16 +231,14 @@ public:
 				if (temp.size() > 1) {
 					newBaseVect.push_back(temp[1]);
 				}
-				//vectCounter++;
 
 			}
-			if (dynamic_cast<NocutStep*>(stepps[i]) != nullptr) {
+			if (std::dynamic_pointer_cast<std::shared_ptr<NocutStep>>(stepps[i]) != nullptr) {
 				steps.push_back(stepps[i]);
 				newBaseVect.push_back(stepps[i]->getBase());
-				//vectCounter++;
 			}
-			if (dynamic_cast<VerticalStep*>(stepps[i]) != nullptr || dynamic_cast<HorizontalStep*>(stepps[i]) != nullptr) {
-				std::vector<Base*> draw;
+			if (std::dynamic_pointer_cast<std::shared_ptr<VerticalStep>>(stepps[i]) != nullptr || std::dynamic_pointer_cast<std::shared_ptr<HorizontalStep>>(stepps[i]) != nullptr) {
+				std::vector<std::shared_ptr<Base>> draw;
 				draw = newBaseVect;
 				if (stepps[i]->getBorder() == false) {
 					for (int j = (temp.size()>1 ? i+1 : i) ; j < stepps.size(); j++) {
@@ -336,52 +256,29 @@ public:
 				file << "<svg " << "xmlns=\"http://www.w3.org/2000/svg\"" << " width=\"" << firstBaseVect->getWidth() << "\" " <<
 					"height=\"" << firstBaseVect->getHeight() << "\">";
 				for (auto a : baseVect) {
-					//std::cout << "Szelessege: " << a->getWidth() << "  Magassaga: " << a->getHeight() << std::endl;
-					//std::cout << "X pozicioja: " << a->getX() << "  Y pozicioja: " << a->getY() << std::endl;
 					file << "<rect x=\"" << a->getX() << "\" " <<
 						"y=\"" << a->getY() << "\" " << "width=\"" << a->getWidth() << "\" "
 						<< "height=\"" << a->getHeight() << "\" " <<
 						"style=\"fill:" << (a->getAccepted() == true ? "red" : "blue") << "; stroke:pink; stroke - width:1; fill - opacity:0.1; stroke - opacity:0.9\" />";
 				}
-				//file << " <text x=\"0\" y=\"15\" fill=\"white\">" << "Waste percentage: " << wastePercentage << "%" << "</text> ";
 
 				file << "</svg>";
 				file.close();
 				draw.clear();
 			}
-			//std::cout << "itt a hiba" << std::endl;
-			
-			/*if (i == (stepps.size() - 1)) {
-				for (int j = vectCounter; j < baseVect.size(); j++) {
-					std::cout << "Van mit belepusholni" << std::endl;
-					newBaseVect.push_back(baseVect[j]);
-				}
-				vectCounter = 0;
-				baseVect.clear();
-				baseVect = newBaseVect;
-				newBaseVect.clear();
-			}*/
 			if (stepps[i]->getBorder()==true) {
 				std::cout << "BORDER" << std::endl;
 
 				vectCounter = 0;
 				baseVect.clear();
 				baseVect = newBaseVect;
-				
-
-				
-				
-				
 				newBaseVect.clear();
-
-				
-
 			}
 			
 
 		}
 		File rem{ "remaining.csv" };
-		std::vector<Base*> remaining;
+		std::vector<std::shared_ptr<Base>> remaining;
 		for (auto a : baseVect) {
 			if (a->getAccepted() == false) {
 				remaining.push_back(a);
@@ -400,23 +297,16 @@ public:
 
 	}
 	void makeCuts() {
-		//std::cout << "itt a problem" << std::endl;
-		std::vector<Base*> newBaseVect;
-		//calculateFitness(false);
-		//int beforeFitness = getFitness();
+		/*This method performs some actual cuts on the rectangles in the 'baseVect' vector.*/
+		std::vector<std::shared_ptr<Base>> newBaseVect;
 
 		int howMuchToCut = (whichBasesToBeCut.size() - (fitness / 10));
-		//std::cout << "hwc " << howMuchToCut << std::endl;
 		int alreadyCut = 0;
 		for (int i = 0; i < baseVect.size(); i++) {
-
-			//std::cout << "eztet e   "<< whichBasesToBeCut[bigCounter]->getHeight() << std::endl;
-			std::vector<Base*> temp;
-			for (auto a : temp) {
-				delete a;
-			}
+			std::vector<std::shared_ptr<Base>> temp;
+			
 			temp.clear();
-			int whichStep = getRandom(1, stepVar); //1 - horizontal, 2 - vertical, 3 - no cut
+			int whichStep = getRandom(1, stepVar);
 			if (alreadyCut >= howMuchToCut) {
 				whichStep = 3;
 			}
@@ -429,20 +319,8 @@ public:
 				) {
 				whichStep = 3;
 			}
-			/*if ((baseW == whichBasesToBeCut[bigCounter]->getWidth() && baseH == whichBasesToBeCut[bigCounter]->getHeight()) ||
-				(baseW == whichBasesToBeCut[bigCounter]->getHeight() && baseH == whichBasesToBeCut[bigCounter]->getWidth())) {
-				whichStep = 3;
-			}*/
-			/*if (baseVect[i]->getHeight() <= 2 * cutWidth || baseVect[i]->getWidth() <= 2 * cutWidth) {
-				whichStep = 3;
-			}*/
 			if (baseVect[i]->getAccepted() == true) {
 				whichStep = 3;
-				/*if (getRandom(1, 100) == 50) {
-				whichStep = getRandom(1, 2);
-				baseVect[i]->setAccepted(false);
-				}*/
-
 			}
 			int whereToCut = 0;
 			if (whichStep == 1) {
@@ -480,25 +358,7 @@ public:
 					}
 				}
 			}
-			//std::cout << "wheretocut " << whereToCut << std::endl;
 			if (whichStep == 1) {
-				/*int whereToCut = getRandom(0, (int)baseVect[i]->getHeight()/ratio);
-				while ((whereToCut*ratio + cutWidth) >= (baseVect[i]->getHeight()))
-					whereToCut = getRandom(0, (int)baseVect[i]->getHeight() / ratio);*/
-
-
-
-					/*while ((whereToCut * ratio) % ratio != cutWidth) {
-						whereToCut = getRandom(0, baseVect[i]->getHeight() / ratio);
-					}*/
-
-					/*if (whereToCut <= 0) {
-						whereToCut = 0;
-					}
-					else {
-						whereToCut = whereToCut*ratio + cutWidth;
-					}*/
-					//std::cout << whereToCut << std::endl;
 				bool b;
 				if (i == (baseVect.size() - 1)) {
 					b = true;
@@ -506,7 +366,7 @@ public:
 				else {
 					b = false;
 				}
-				steps.push_back(new HorizontalStep(baseVect[i], whereToCut, b));
+				steps.push_back(std::make_shared<HorizontalStep>( HorizontalStep(baseVect[i], whereToCut, b)));
 				alreadyCut++;
 				temp = baseVect[i]->horizontalCut(whereToCut, cutWidth);
 				if (temp.size() > 0) {
@@ -526,23 +386,7 @@ public:
 				else {
 					b = false;
 				}
-				/*int whereToCut = getRandom(0, (int)baseVect[i]->getWidth() / ratio);
-				while((whereToCut*ratio+cutWidth) >= (baseVect[i]->getWidth()))
-				whereToCut = getRandom(0, (int)baseVect[i]->getWidth() / ratio);*/
-
-
-
-
-				/*while ((whereToCut * ratio)%ratio != cutWidth) {
-					whereToCut = getRandom(0, baseVect[i]->getWidth()/ratio);
-				}*/
-				/*if (whereToCut <= 0) {
-					whereToCut = 0;
-				}else{
-				whereToCut = whereToCut*ratio + cutWidth;
-				}*/
-				//std::cout << whereToCut << std::endl;
-				steps.push_back(new VerticalStep(baseVect[i], whereToCut, b));
+				steps.push_back(std::make_shared<VerticalStep>( VerticalStep(baseVect[i], whereToCut, b)));
 				temp = baseVect[i]->verticalCut(whereToCut, cutWidth);
 				alreadyCut++;
 				if (temp.size() > 0) {
@@ -561,7 +405,7 @@ public:
 				else {
 					b = false;
 				}
-				steps.push_back(new NocutStep(baseVect[i], b));
+				steps.push_back(std::make_shared<NocutStep>( NocutStep(baseVect[i], b)));
 				newBaseVect.push_back(baseVect[i]);
 			}
 
@@ -569,32 +413,9 @@ public:
 			
 
 		}
-
-		/*calculateFitness(false);
-		int afterFitness = getFitness();
-
-		if(afterFitness<=beforeFitness){
-		badCounter++;
-		}
-
-		if (badCounter >= 11) {
-		badCounter = 0;
-		int flagCounter = 0;
-		for (int t = steps.size() - 1; t >= 0 && flagCounter<=10; t--) {
-		if (steps[t]->getBorder() == true) {
-		flagCounter++;
-		}
-		if(flagCounter!=11){
-		steps.pop_back();
-		}
-		}
-		}*/
 		baseVect.clear();
 		baseVect = newBaseVect;
 
 		newBaseVect.clear();
-
-
-		//std::cout << "megse itt a problem" << std::endl;
 	}
 };

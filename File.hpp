@@ -6,14 +6,16 @@
 
 
 class File {
+	/*This class can read from and write to CSV files.*/
 private:
 	std::string filedir;
 public:
 	File(std::string file):filedir(file){}
-	std::vector<Base*> readStockFromCSV() {
+	std::vector<std::shared_ptr<Base>> readStockFromCSV() {
+		/*Returns a vector containing the rectangles stored in the CSV file.*/
 		std::ifstream file(filedir);
 		std::string line;
-		std::vector<Base*> toReturn;
+		std::vector<std::shared_ptr<Base>> toReturn;
 		while (std::getline(file,line)) {
 			std::vector<double> temp;
 			std::string delimiter = ",";
@@ -26,22 +28,23 @@ public:
 				temp.push_back(std::stod(token));
 				line.erase(0, pos + delimiter.length());
 			}
-			for (auto& a : temp) {
+			for (auto a : temp) {
 				std::cout << "Temp element: " << a << std::endl;
 			}
 			std::cout << std::endl;
 			for (int i = 0; i < temp[2]; i++) {
-				toReturn.push_back(new Base(temp[1], temp[0],0,0));
+				toReturn.push_back(std::make_shared<Base>( Base(temp[1], temp[0], 0, 0)));
 			}
 		}
 		file.close();
 		return toReturn;
 	}
-	void writeStockToCSV(std::vector<Base*> stock) {
+	void writeStockToCSV(std::vector<std::shared_ptr<Base>> stock) {
+		/*Generates a file that is going to contain the rectangles stored in the 'stock' vector*/
 		std::ofstream file(filedir);
 		int counter = 0;
-		Base* currElement = stock[0];
-		for (auto& element : stock) {
+		std::shared_ptr<Base> currElement{ stock[0] };
+		for (auto element : stock) {
 			if (element->getHeight() == currElement->getHeight() && element->getWidth() == currElement->getWidth()) {
 				counter++;
 				currElement = element;
@@ -53,7 +56,7 @@ public:
 			}
 		}
 		file << std::to_string(currElement->getWidth()) << "," << std::to_string(currElement->getHeight()) << "," << std::to_string(counter) << "," << "\n";
-		delete currElement;
+		
 		file.close();
 	}
 };
